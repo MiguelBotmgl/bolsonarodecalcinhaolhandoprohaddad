@@ -58,8 +58,8 @@ if (process.env.REDIS_URL) {
   redisClient = createClient({
     url: process.env.REDIS_URL,
     socket: {
-        keepAlive: 5000,
-        connectTimeout: 10000
+      keepAlive: 5000,
+      connectTimeout: 10000
     }
   });
 
@@ -68,16 +68,16 @@ if (process.env.REDIS_URL) {
   });
 
   redisClient.on('error', function (err) {
-      console.error(`[${new Date().toISOString()}] Erro de cliente Redis:`, err);
+    console.error(`[${new Date().toISOString()}] Erro de cliente Redis:`, err);
   });
   redisClient.on('connect', function () {
-      console.log(`[${new Date().toISOString()}] Conectado ao servidor Redis para sessões.`);
+    console.log(`[${new Date().toISOString()}] Conectado ao servidor Redis para sessões.`);
   });
   redisClient.on('ready', function () {
-      console.log(`[${new Date().toISOString()}] Cliente Redis pronto para uso.`);
+    console.log(`[${new Date().toISOString()}] Cliente Redis pronto para uso.`);
   });
   redisClient.on('end', function () {
-      console.log(`[${new Date().toISOString()}] Conexão com Redis fechada.`);
+    console.log(`[${new Date().toISOString()}] Conexão com Redis fechada.`);
   });
 
 
@@ -255,7 +255,7 @@ app.post('/api/login', (req, res) => {
     req.session.loggedIn = true;
     req.session.userType = tipoLogado;
     req.session.username = credencialEncontrada.username;
-    delete req.session.vipSectionEntryTimestamp; 
+    delete req.session.vipSectionEntryTimestamp;
 
     let redirectPath;
     if (tipoLogado === "packvip" || tipoLogado === "pack") {
@@ -496,7 +496,7 @@ setInterval(cleanupExpiredCredentials, 60 * 60 * 1000);
 app.listen(PORT, () => {
   console.log(`[${new Date().toISOString()}] Servidor rodando na porta ${PORT} - http://localhost:${PORT}`);
   if (!redisStore) {
-      console.warn(`[${new Date().toISOString()}] ATENÇÃO: Usando MemoryStore para sessões. Não recomendado para produção!`);
+    console.warn(`[${new Date().toISOString()}] ATENÇÃO: Usando MemoryStore para sessões. Não recomendado para produção!`);
   }
   console.log(`[${new Date().toISOString()}] Credenciais temporárias (12h) expirarão após ${EXPIRATION_TIME_MS / (60 * 60 * 1000)} horas.`);
   console.log(`[${new Date().toISOString()}] Sessão em páginas VIP específicas expirará após ${VIP_SECTION_TIMEOUT_MS / (60 * 1000)} minutos de entrada na seção.`);
