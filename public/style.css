@@ -137,6 +137,14 @@ header h1 span {
   height: auto;
   margin-bottom: 30px;
   border-radius: 10px;
+  /* Adicionado para dificultar download */
+  pointer-events: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
 }
 
 .product .info {
@@ -287,6 +295,14 @@ header h1 span {
   /* A animação de float é aplicada à imagem diretamente se desejado, ou ao .icon-box */
   animation: float 3s ease-in-out infinite;
   /* Aplicando float diretamente na imagem */
+  /* Adicionado para dificultar download */
+  pointer-events: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
 }
 
 
