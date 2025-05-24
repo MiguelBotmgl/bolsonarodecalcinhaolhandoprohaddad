@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/x-icon" href="imagens/favicon.ico">
+  <title>Cancelar Compra</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body,
+    html {
+      height: 100%;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+      /* Evita scrollbars desnecessários */
+    }
+
+    body {
+      background: linear-gradient(-45deg, #000000, #5a0081, #3a0066, #1a001f);
+      background-size: 800% 800%;
+      /* Aumentado para animação mais suave */
+      animation: gradientBG 20s ease infinite;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    @keyframes gradientBG {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(0px);
+      }
+
+      50% {
+        transform: translateY(-15px);
+      }
+
+      100% {
+        transform: translateY(0px);
+      }
+    }
+
+    h1 {
+      font-size: 2em;
+      /* Ajustado para melhor responsividade */
+      margin-bottom: 20px;
+      /* Reduzido um pouco */
+    }
+
+    .main-image {
+      max-width: 250px;
+      /* Reduzido um pouco para telas menores */
+      width: 80%;
+      /* Usar porcentagem para responsividade */
+      height: auto;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 20px 6px rgba(255, 255, 255, 0.3);
+      animation: float 4s ease-in-out infinite;
+    }
+
+    .quote {
+      font-size: 1.1em;
+      /* Ajustado */
+      margin: 15px 0;
+      /* Reduzido */
+      max-width: 90%;
+      /* Usar porcentagem */
+      line-height: 1.5;
+      text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    }
+
+    .buttons-container {
+      margin-top: 25px;
+      /* Espaço acima dos botões */
+      display: flex;
+      flex-direction: column;
+      /* Botões um abaixo do outro em telas pequenas */
+      align-items: center;
+      gap: 15px;
+      /* Espaço entre os botões */
+    }
+
+    .action-btn {
+      /* Classe genérica para os botões de ação */
+      padding: 12px 25px;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      /* Levemente ajustado */
+      font-size: 1em;
+      /* Ajustado */
+      cursor: pointer;
+      text-decoration: none;
+      transition: background-color 0.3s, transform 0.2s;
+      min-width: 200px;
+      /* Largura mínima para consistência */
+    }
+
+    .action-btn:hover {
+      transform: translateY(-2px);
+      /* Efeito de levantar no hover */
+    }
+
+    .back-btn {
+      /* Botão maior - Voltar à compra */
+      background-color: #ff4444;
+      /* Vermelho para "voltar" ou "não cancelar" */
+    }
+
+    .back-btn:hover {
+      background-color: #cc0000;
+    }
+
+    .cancel-permanently-btn {
+      /* Botão menor - Cancelar e ir para o início */
+      background-color: #6c757d;
+      /* Cinza para uma ação secundária/destrutiva */
+      font-size: 0.9em;
+      /* Ligeiramente menor */
+      padding: 10px 20px;
+      /* Padding menor */
+      min-width: 180px;
+    }
+
+    .cancel-permanently-btn:hover {
+      background-color: #5a6268;
+    }
+
+    /* O .image-container não parece estar sendo usado, pode ser removido se não houver imagem nele */
+    .image-container {
+      margin-top: 20px;
+    }
+
+    .image-container img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 12px;
+    }
+
+    /* Media query para alinhar botões lado a lado em telas maiores */
+    @media (min-width: 480px) {
+      .buttons-container {
+        flex-direction: row;
+        /* Botões lado a lado */
+        justify-content: center;
+      }
+
+      h1 {
+        font-size: 2.2em;
+      }
+
+      .quote {
+        font-size: 1.2em;
+      }
+
+      .main-image {
+        max-width: 300px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Tem certeza que deseja cancelar sua compra?</h1>
+  <img src="imagens/home.jpg" alt="Imagem ilustrativa" class="main-image" />
+  <div class="quote">"Quem não se arrisca, sobrevive. Quem se joga, vive o propósito!"</div>
+
+  <div class="buttons-container">
+    <button class="action-btn back-btn" onclick="history.back()">Voltar à minha compra</button>
+    <a href="index.html" class="action-btn cancel-permanently-btn">Cancelar e ir para o Início</a>
+  </div>
+
+</body>
+
+</html>

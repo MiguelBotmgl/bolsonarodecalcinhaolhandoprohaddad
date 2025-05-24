@@ -1,0 +1,418 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(-45deg, #000000, #5a0081, #3a0066, #1a001f);
+  background-size: 400% 400%;
+  animation: gradientFlowDiagonal 15s ease infinite;
+  color: white;
+  overflow-x: hidden;
+}
+
+@keyframes gradientFlowDiagonal {
+  0% {
+    background-position: 0% 0%;
+  }
+
+  50% {
+    background-position: 100% 100%;
+  }
+
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+header {
+  padding: 20px 40px;
+}
+
+header h1 span {
+  color: #5a0081;
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 80px 20px;
+  margin-top: 20px;
+  animation: fadeIn 2s ease forwards;
+}
+
+.intro-text {
+  max-width: 700px;
+}
+
+.intro span {
+  color: #5a0081;
+}
+
+.intro h2 {
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+.intro p {
+  font-size: 20px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.intro-video {
+  margin-top: 40px;
+  width: 100%;
+  max-width: 400px;
+  aspect-ratio: 1;
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.intro-video video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.floating-icons {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 40px;
+  /* Reduzido um pouco o gap para acomodar melhor */
+  margin: 60px auto 40px auto;
+  max-width: 1000px;
+  /* Pode ajustar conforme necessário */
+  padding: 0 20px;
+}
+
+.floating-icons p {
+  margin-top: 10px;
+  /* Ajustado */
+  font-size: 16px;
+  font-weight: bold;
+  /* Para dar mais destaque ao texto do ícone */
+}
+
+.carousel {
+  position: relative;
+  max-width: 1200px;
+  margin: 100px auto 60px auto;
+  overflow: hidden;
+  padding-bottom: 60px;
+  opacity: 0;
+  transform: translateY(50px);
+  transition: all 1s ease;
+}
+
+.carousel.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.product {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.product.active {
+  display: flex;
+}
+
+.product img {
+  max-width: 100%;
+  width: 450px;
+  height: auto;
+  margin-bottom: 30px;
+  border-radius: 10px;
+}
+
+.product .info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.product .info span {
+  font-size: 16px;
+  opacity: 0.7;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.product .info h2 {
+  font-size: 40px;
+  margin: 5px 0 15px 0;
+  line-height: 1.2;
+}
+
+.product .info .vip {
+  color: gold;
+  font-size: inherit;
+}
+
+.product .info p {
+  font-size: 18px;
+  margin-bottom: 25px;
+  max-width: 550px;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.buy-btn {
+  padding: 15px 30px;
+  background-color: #00c67c;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.buy-btn:hover {
+  background-color: #00a568;
+  transform: translateY(-2px);
+}
+
+
+.nav {
+  position: absolute;
+  top: 50%;
+  font-size: 28px;
+  background: rgba(0, 0, 0, 0.3);
+  border: none;
+  padding: 12px 18px;
+  color: white;
+  cursor: pointer;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  z-index: 10;
+}
+
+.nav:hover {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.nav.prev {
+  left: 20px;
+}
+
+.nav.next {
+  right: 20px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+    /* Mantém a animação de flutuação */
+  }
+}
+
+.quality-title {
+  text-align: center;
+  font-size: 32px;
+  margin-top: 60px;
+  margin-bottom: 15px;
+}
+
+.quality-title span {
+  color: #5a0081;
+}
+
+.quality-description {
+  text-align: center;
+  font-size: 18px;
+  margin-bottom: 40px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+}
+
+.icon-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 200px;
+  /* Largura do container do ícone */
+  text-align: center;
+}
+
+/* REVERTENDO E AJUSTANDO para imagens retangulares */
+.icon-box img {
+  width: 100%;
+  /* Faz a imagem ocupar toda a largura do .icon-box (200px) */
+  height: auto;
+  /* Altura automática para manter a proporção original da imagem */
+  object-fit: contain;
+  /* Garante que toda a imagem seja visível, sem cortes, mantendo a proporção */
+  border-radius: 8px;
+  /* Mantém o arredondamento se desejado */
+  margin-bottom: 10px;
+  /* A animação de float é aplicada à imagem diretamente se desejado, ou ao .icon-box */
+  animation: float 3s ease-in-out infinite;
+  /* Aplicando float diretamente na imagem */
+}
+
+
+@media (max-width: 768px) {
+  header {
+    padding: 15px 20px;
+    text-align: center;
+  }
+
+  .intro {
+    padding: 40px 15px;
+  }
+
+  .intro h2 {
+    font-size: 28px;
+  }
+
+  .intro p {
+    font-size: 16px;
+  }
+
+  .intro-video {
+    max-width: 300px;
+  }
+
+  .quality-title {
+    font-size: 26px;
+  }
+
+  .quality-description {
+    font-size: 16px;
+    padding: 0 10px;
+  }
+
+  .floating-icons {
+    gap: 20px;
+    /* Espaço entre os ícones em telas menores */
+    margin: 40px auto;
+    flex-direction: column;
+    /* Ícones empilhados em telas menores */
+  }
+
+  .icon-box {
+    width: 220px;
+    /* Pode aumentar um pouco a largura do container em mobile se os ícones ficarem muito espremidos */
+  }
+
+  /* Imagens dos ícones em telas menores */
+  .icon-box img {
+    width: 100%;
+    /* Ocupa a largura do .icon-box */
+    height: auto;
+    /* Mantém a proporção */
+  }
+
+
+  .floating-icons p {
+    font-size: 15px;
+    /* Aumentado um pouco para melhor leitura */
+  }
+
+  .carousel {
+    margin: 60px auto 40px auto;
+    padding-bottom: 50px;
+  }
+
+  .product img {
+    width: 300px;
+    margin-bottom: 20px;
+  }
+
+  .product .info h2 {
+    font-size: 30px;
+  }
+
+  .product .info p {
+    font-size: 15px;
+    margin-bottom: 20px;
+  }
+
+  .buy-btn {
+    padding: 12px 25px;
+    font-size: 16px;
+  }
+
+  .nav {
+    font-size: 22px;
+    padding: 8px 14px;
+  }
+
+  .nav.prev {
+    left: 10px;
+  }
+
+  .nav.next {
+    right: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .intro h2 {
+    font-size: 24px;
+  }
+
+  .intro p {
+    font-size: 15px;
+  }
+
+  .quality-title {
+    font-size: 22px;
+  }
+
+  .quality-description {
+    font-size: 15px;
+  }
+
+  .product .info h2 {
+    font-size: 26px;
+  }
+
+  .product .info p {
+    font-size: 14px;
+  }
+
+  .icon-box {
+    width: 200px;
+    /* Ajuste para telas bem pequenas */
+  }
+}

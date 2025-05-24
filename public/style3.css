@@ -1,0 +1,99 @@
+/* Fundo degrade animado */
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(270deg, #000000, #5a0081, #2b0051, #5a0081);
+  background-size: 800% 800%;
+  animation: gradientMove 15s ease infinite;
+  color: white;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  overflow-x: hidden;
+  position: relative;
+}
+
+h1 {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  color: #00ff00;
+  /* Cor de destaque */
+  text-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+}
+
+p {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+}
+
+.money-rain {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: visible;
+  z-index: 9999;
+  pointer-events: none;
+  /* Importante para permitir cliques nos elementos abaixo */
+}
+
+.money-rain span {
+  position: absolute;
+  top: -50px;
+  font-size: 24px;
+  animation-name: fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  user-select: none;
+  opacity: 0.8;
+  filter: drop-shadow(0 0 2px #00ff00);
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.login-button {
+  background-color: #5a0081;
+  /* Cor do botão de login */
+  color: white;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.2em;
+  cursor: pointer;
+  text-decoration: none;
+  /* Para remover o sublinhado do link */
+  transition: background-color 0.3s ease;
+  margin-top: 20px;
+  /* Adiciona espaçamento acima do botão */
+}
+
+.login-button:hover {
+  background-color: #7b00a0;
+}

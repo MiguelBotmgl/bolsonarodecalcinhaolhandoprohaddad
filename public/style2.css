@@ -1,0 +1,70 @@
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(-45deg, #000000, #5a0081, #3a0066, #1a001f);
+  background-size: 400% 400%;
+  animation: gradientFlowDiagonal 15s ease infinite;
+  color: white;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+@keyframes gradientFlowDiagonal {
+  0% {
+    background-position: 0% 0%;
+  }
+
+  50% {
+    background-position: 100% 100%;
+  }
+
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+header {
+  padding: 20px 40px;
+}
+
+header h1 span {
+  color: #5a0081;
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 80px 20px;
+  margin-top: 20px;
+}
+
+.intro-text {
+  max-width: 700px;
+}
+
+.intro span {
+  color: #5a0081;
+}
+
+.intro h2 {
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+.intro p {
+  font-size: 20px;
+  max-width: 600px;
+}
+
+.buy-btn {
+  padding: 15px 20px;
+  background-color: #00c67c;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 18px;
+  cursor: pointer;
+}

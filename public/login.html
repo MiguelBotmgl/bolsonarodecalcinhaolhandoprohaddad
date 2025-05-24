@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login VIP</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" type="image/x-icon" href="imagens/favicon.ico">
+</head>
+
+<body>
+
+  <header>
+    <h1>M<span>G</span>L - Login</h1>
+  </header>
+
+  <section class="intro">
+    <div class="intro-text">
+      <h2>Área <span>VIP</span> – Acesso Restrito</h2>
+      <p>Insira seu login e senha temporária para acessar nossos bots.</p>
+
+      <form id="loginForm" style="margin-top: 30px;">
+        <input type="text" id="username" placeholder="Login Temporário" required
+          style="padding: 10px; width: 80%; max-width: 300px; margin-bottom: 10px;" /><br>
+        <input type="password" id="password" placeholder="Senha Temporária" required
+          style="padding: 10px; width: 80%; max-width: 300px; margin-bottom: 20px;" /><br> <button type="submit"
+          class="buy-btn" style="margin-top: 20px;">Entrar</button>
+        <p id="error-msg" style="color: red; margin-top: 15px;"></p>
+      </form>
+
+    </div>
+  </section>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      const submitButton = this.querySelector('button[type="submit"]');
+      const errorMsgElement = document.getElementById('error-msg');
+
+      submitButton.disabled = true;
+      submitButton.textContent = 'Verificando...';
+      errorMsgElement.textContent = ''; // Limpa mensagens de erro anteriores
+
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+
+        if (data.success && data.redirect) {
+          window.location.href = data.redirect;
+        } else {
+          errorMsgElement.textContent = data.message || "Login ou senha inválidos ou expirados.";
+        }
+      } catch (error) {
+        console.error("Erro ao tentar fazer login:", error);
+        errorMsgElement.textContent = "Erro de comunicação. Tente novamente mais tarde.";
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Entrar';
+      }
+    });
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Finalizar Compra</title>
+  <link rel="icon" type="image/x-icon" href="imagens/favicon.ico">
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(-45deg, #000000, #5a0081, #3a0066, #1a001f);
+      background-size: 800% 800%;
+      animation: gradientBG 20s ease infinite;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+      box-sizing: border-box; /* Adicionado para melhor controle de padding e width */
+    }
+
+    @keyframes gradientBG {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    .payment-container {
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+      max-width: 500px;
+      width: 100%; /* Ocupa a largura do padding do body */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      box-sizing: border-box; /* Adicionado para melhor controle de padding e width */
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 24px;
+      font-weight: bold;
+      color: #aaa;
+      text-decoration: none;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .close-btn:hover {
+      color: #fff;
+    }
+
+    .payment-container h1 {
+      margin-bottom: 20px;
+      margin-top: 20px;
+      color: #5a0081;
+      font-size: 1.8em; /* Ajuste conforme necessário */
+    }
+
+    .qr-code-img {
+      width: 200px;
+      height: 200px;
+      background-color: white;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .qr-code-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    .payment-container p { /* Estilo geral para parágrafos dentro do container */
+      margin-bottom: 15px; /* Ajustado para consistência */
+      font-size: 1.0em; /* Ajustado para consistência */
+      line-height: 1.5;
+    }
+
+    .product-info { /* Estilo específico para informação do produto */
+      margin-bottom: 15px;
+      font-size: 1.2em;
+      font-weight: bold;
+    }
+
+    /* Estilos para o PIX Copia e Cola */
+    .pix-copy-paste {
+      margin-top: 5px; /* Reduzido o espaço superior */
+      margin-bottom: 20px;
+      width: 100%; /* Ocupa a largura do form para alinhar com os inputs */
+      max-width: 300px; /* Mesma largura máxima dos input-groups para consistência */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .pix-copy-paste p { /* Parágrafo dentro do pix-copy-paste */
+        margin-bottom: 10px; /* Espaço entre o texto e o botão */
+        font-size: 0.9em;
+    }
+
+    .pix-code-display {
+      display: none; /* Mantido oculto */
+    }
+
+    .copy-btn {
+      background-color: #007bff;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.95em;
+      transition: background-color 0.3s ease;
+      width: 100%; /* Botão ocupa a largura do .pix-copy-paste (max-width: 300px) */
+      min-width: initial; /* Remove min-width para se ajustar ao width de 100% do pai */
+      box-sizing: border-box;
+      /* margin-top: 5px;  Removido, pois o <p> acima já dá espaço */
+    }
+
+    .copy-btn:hover {
+      background-color: #0056b3;
+    }
+    /* Fim dos estilos para o PIX Copia e Cola */
+
+    #paymentForm {
+      display: flex;
+      flex-direction: column;
+      align-items: center; /* Centraliza os .input-group e .confirm-btn */
+      width: 100%; /* Ocupa a largura do .payment-container */
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+      width: 100%; /* Ocupa a largura definida por #paymentForm e seu align-items */
+      max-width: 300px; /* Largura máxima para os campos */
+      box-sizing: border-box;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 5px;
+      text-align: left;
+      font-size: 0.9em;
+    }
+
+    .input-group input[type="text"],
+    .input-group input[type="tel"] {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      background-color: #333;
+      color: white;
+      box-sizing: border-box;
+      font-size: 1em;
+    }
+
+    .phone-input-container {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #333;
+    }
+
+    .phone-prefix {
+      padding: 10px;
+      color: #aaa;
+      pointer-events: none;
+      white-space: nowrap;
+      font-size: 1em;
+    }
+
+    .phone-input-container input[type="tel"] {
+      flex-grow: 1;
+      border: none;
+      background-color: transparent;
+      padding-left: 5px;
+      color: white; /* Garantir que o texto do input seja branco */
+      font-size: 1em; /* Garantir que o texto do input seja branco */
+    }
+
+    .phone-input-container input[type="tel"]:focus {
+      outline: none;
+    }
+
+    .confirm-btn {
+      background-color: #5a0081;
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.1em;
+      transition: background-color 0.3s ease;
+      margin-top: 10px; /* Espaço acima do botão de confirmar */
+      width: 100%; /* Para ocupar a mesma largura dos inputs */
+      max-width: 300px; /* Mesma largura máxima */
+      box-sizing: border-box;
+    }
+
+    .confirm-btn:hover {
+      background-color: #7b00a0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="payment-container">
+    <a href="cancelamento.html" class="close-btn" id="cancelButton" title="Cancelar Compra">&times;</a>
+
+    <h1>Finalizar Compra</h1>
+    <p class="product-info" id="productName">NOME DO PRODUTO AQUI</p>
+    <div class="qr-code-img">
+      <img id="qrCodeImage" src="" alt="QR Code de Pagamento">
+    </div>
+    <p>Escaneie o QR Code para efetuar o pagamento via Pix.</p>
+
+    <div class="pix-copy-paste">
+        <p>Ou copie o código Pix:</p>
+        <div class="pix-code-display" id="pixCodeDisplay"></div> <button class="copy-btn" id="copyPixButton">Copiar Código Pix</button>
+    </div>
+
+    <form id="paymentForm">
+      <div class="input-group">
+        <label for="name">Seu Nome:</label>
+        <input type="text" id="name" name="name" required />
+      </div>
+      <div class="input-group">
+        <label for="phoneLocal">Seu Telefone:</label>
+        <div class="phone-input-container">
+          <span class="phone-prefix">+55&nbsp;</span>
+          <input type="tel" id="phoneLocal" name="phoneLocal" required placeholder="21 9XXXX-XXXX" />
+        </div>
+      </div>
+      <button type="submit" class="confirm-btn">Confirmar Pagamento</button>
+    </form>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const product = urlParams.get('product');
+      const productNameElement = document.getElementById('productName');
+      const qrCodeImageElement = document.getElementById('qrCodeImage');
+      const paymentForm = document.getElementById('paymentForm');
+      const phoneLocalInput = document.getElementById('phoneLocal');
+      const copyPixButton = document.getElementById('copyPixButton');
+
+      phoneLocalInput.addEventListener('input', function (e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length > 11) {
+            value = value.substring(0, 11);
+        }
+        e.target.value = value;
+      });
+
+      let displayProductName = '';
+      let qrImagePath = '';
+      let pixCopyPasteCode = '';
+
+      // !! IMPORTANTE: Substitua pelos seus códigos PIX e caminhos de imagem reais !!
+      // E TAMBÉM OS NOMES DOS PRODUTOS EXATAMENTE COMO USADO NO BACKEND PARA GERAR CREDENCIAIS
+      if (product === 'casino') { // Este 'casino' deve corresponder ao ?product=casino na URL
+        displayProductName = 'CASINOBOT'; // Nome do produto para exibição e enviado ao backend
+        qrImagePath = 'imagens/qr-casino.png';
+        pixCopyPasteCode = 'SEU_CODIGO_PIX_COPIA_E_COLA_CASINO';
+      } else if (product === 'sporting') { // Este 'sporting' deve corresponder ao ?product=sporting na URL
+        displayProductName = 'SPORTINGBOT'; // Nome do produto para exibição e enviado ao backend
+        qrImagePath = 'imagens/qr-sporting.png';
+        pixCopyPasteCode = 'SEU_CODIGO_PIX_COPIA_E_COLA_SPORTING';
+      } else if (product === 'pack') { // Este 'pack' deve corresponder ao ?product=pack na URL
+        displayProductName = 'PACK CASINOBOT + SPORTINGBOT'; // Nome do produto para exibição e enviado ao backend
+        qrImagePath = 'imagens/qr-pack.png';
+        pixCopyPasteCode = 'SEU_CODIGO_PIX_COPIA_E_COLA_PACK';
+      } else {
+        displayProductName = 'Produto Indisponível';
+        qrImagePath = 'imagens/qr-default.png';
+        pixCopyPasteCode = 'NENHUM_CODIGO_DISPONIVEL';
+        productNameElement.style.color = 'red';
+        if (copyPixButton) copyPixButton.style.display = 'none';
+      }
+
+      productNameElement.textContent = displayProductName;
+      qrCodeImageElement.src = qrImagePath;
+      qrCodeImageElement.alt = `QR Code para ${displayProductName}`;
+
+      copyPixButton.addEventListener('click', () => {
+        if (!pixCopyPasteCode || pixCopyPasteCode === 'NENHUM_CODIGO_DISPONIVEL') {
+            alert('Não há código PIX disponível para este produto.');
+            return;
+        }
+
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(pixCopyPasteCode)
+            .then(() => {
+                copyPixButton.textContent = 'Copiado!';
+                setTimeout(() => {
+                    copyPixButton.textContent = 'Copiar Código Pix';
+                }, 2000);
+            })
+            .catch(err => {
+                console.error('Erro ao copiar código PIX: ', err);
+                alert('Falha ao copiar o código. Tente manualmente.');
+            });
+        } else {
+            try {
+                const textArea = document.createElement('textarea');
+                textArea.value = pixCopyPasteCode;
+                textArea.style.position = 'fixed';
+                textArea.style.top = '-9999px';
+                textArea.style.left = '-9999px';
+                document.body.appendChild(textArea);
+                textArea.select();
+                textArea.focus();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                copyPixButton.textContent = 'Copiado!';
+                setTimeout(() => {
+                    copyPixButton.textContent = 'Copiar Código Pix';
+                }, 2000);
+            } catch (err) {
+                console.error('Fallback: Erro ao copiar código PIX: ', err);
+                alert('Falha ao copiar o código. Por favor, copie manualmente.');
+            }
+        }
+      });
+
+      paymentForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const name = document.getElementById('name').value;
+        const phoneLocalPart = phoneLocalInput.value.replace(/\D/g, '');
+        const fullPhoneNumber = `+55${phoneLocalPart}`;
+
+        if (!name.trim()) {
+          alert('Por favor, preencha seu nome.');
+          return;
+        }
+        if (!phoneLocalPart.trim()) {
+          alert('Por favor, preencha seu telefone completo (DDD + Número).');
+          return;
+        }
+        if (phoneLocalPart.length < 10 || phoneLocalPart.length > 11) {
+          alert('Número de telefone inválido. Inclua DDD (2 dígitos) e o número (8 ou 9 dígitos). Ex: 21912345678');
+          return;
+        }
+
+        const submitButton = paymentForm.querySelector('.confirm-btn');
+        submitButton.disabled = true;
+        submitButton.textContent = 'Processando...';
+
+        try {
+          // ESTA É A PARTE CORRIGIDA E IMPORTANTE:
+          const response = await fetch('/confirm-payment', { // Chamada real para o backend
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            // Garanta que `displayProductName` aqui seja o valor que o backend espera para `product`
+            body: JSON.stringify({ name, phone: fullPhoneNumber, product: displayProductName }),
+          });
+          const data = await response.json();
+          
+          if (response.ok && data.success) { // Verifica se a requisição HTTP foi OK e o success do JSON
+            window.location.href = `confirmado.html?product=${encodeURIComponent(product || 'unknown')}&name=${encodeURIComponent(name)}`;
+          } else {
+            alert(data.message || 'Erro ao confirmar pagamento. Verifique os dados e tente novamente.');
+          }
+        } catch (error) {
+          console.error('Erro na requisição:', error);
+          alert('Ocorreu um erro de comunicação. Tente novamente mais tarde.');
+        } finally {
+          submitButton.disabled = false;
+          submitButton.textContent = 'Confirmar Pagamento';
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>
