@@ -1,0 +1,32 @@
+# Credenciais e Segredos
+credentials.json
+.env
+
+# Dependências do Node.js
+node_modules/
+
+# Arquivos de log (se você gerar algum)
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Arquivos de sistema operacional
+.DS_Store
+Thumbs.db
+
+# Arquivos de configuração de IDE (opcional, mas comum)
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Arquivos de build ou output temporário (se aplicável ao seu fluxo)
+# Exemplo: se você tivesse uma pasta 'dist' ou 'build' gerada
+# dist/
+# build/
