@@ -3,17 +3,30 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
+
+// --- NOVAS IMPORTAÇÕES PARA SESSÃO COM REDIS ---
 const session = require('express-session');
+const RedisStore = require("connect-redis").default;
+const { createClient } = require("redis");
+// --- FIM DAS NOVAS IMPORTAÇÕES ---
 
 const app = express();
+
+// --- CONFIGURAR PARA CONFIAR NO PROXY DO RENDER ---
+// Importante quando seu app está atrás de um proxy reverso (como no Render)
+// Isso ajuda o Express a entender corretamente informações como o protocolo (HTTPS)
+// e o IP do cliente, que são passados pelo proxy através de cabeçalhos.
+app.set('trust proxy', 1);
+// --- FIM DA CONFIGURAÇÃO DO PROXY ---
+
 const PORT = process.env.PORT || 3000;
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
 const CREDENTIALS_FILE_PATH = './credentials.json';
-const EXPIRATION_TIME_MS = 12 * 60 * 60 * 1000; // 12 horas em milissegundos
-const VIP_SECTION_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutos para páginas VIP específicas
+const EXPIRATION_TIME_MS = 12 * 60 * 60 * 1000;
+const VIP_SECTION_TIMEOUT_MS = 5 * 60 * 1000;
 
 let credentials = {};
 try {
@@ -27,7 +40,7 @@ try {
       } else if (typeof credEntry === 'object' && credEntry !== null && credEntry.username && credEntry.password) {
         credentials[tipo] = [credEntry];
       } else {
-        console.warn(`[${new Date().toISOString()}] Formato inesperado para o tipo '${tipo}' no arquivo ${CREDENTIALS_FILE_PATH}. Inicializando como lista vazia.`);
+        console.warn(`[<span class="math-inline">\{new Date\(\)\.toISOString\(\)\}\] Formato inesperado para o tipo '</span>{tipo}' no arquivo ${CREDENTIALS_FILE_PATH}. Inicializando como lista vazia.`);
         credentials[tipo] = [];
       }
     }
@@ -40,24 +53,77 @@ try {
   }
 }
 
+// --- CONFIGURAÇÃO DA SESSÃO COM REDIS ---
+let redisClient;
+let redisStore;
+
+if (process.env.REDIS_URL) {
+  redisClient = createClient({
+    url: process.env.REDIS_URL,
+    socket: {
+        // Opções de socket para ambientes como o Render que podem fechar conexões inativas
+        keepAlive: 5000, // Envia um PING a cada 5 segundos
+        connectTimeout: 10000 // Timeout para conexão de 10 segundos
+    }
+  });
+
+  redisClient.connect().catch(err => {
+    console.error(`[${new Date().toISOString()}] Erro inicial ao conectar ao Redis:`, err);
+  });
+
+  redisClient.on('error', function (err) {
+      console.error(`[${new Date().toISOString()}] Erro de cliente Redis:`, err);
+  });
+  redisClient.on('connect', function () {
+      console.log(`[${new Date().toISOString()}] Conectado ao servidor Redis para sessões.`);
+  });
+  redisClient.on('ready', function () {
+      console.log(`[${new Date().toISOString()}] Cliente Redis pronto para uso.`);
+  });
+  redisClient.on('end', function () {
+      console.log(`[${new Date().toISOString()}] Conexão com Redis fechada.`);
+  });
+
+
+  redisStore = new RedisStore({
+    client: redisClient,
+    prefix: "mglapp-session:", // Prefixo para evitar conflitos de nome de chave no Redis
+    // ttl: ... // Opcional: tempo de vida da sessão no Redis, por padrão usa cookie.maxAge
+    disableTouch: true // Opcional, pode melhorar o desempenho
+  });
+  console.log(`[${new Date().toISOString()}] Usando Redis para armazenamento de sessão.`);
+} else {
+  console.warn(`[${new Date().toISOString()}] ATENÇÃO: REDIS_URL não configurada. Usando MemoryStore para sessões (não recomendado para produção).`);
+  // Fallback para MemoryStore se REDIS_URL não estiver definida (embora não seja ideal)
+}
+
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'aK3$sP9!zQ7cTfG2@rX5vY8wZ1uJ0iH',
+  store: redisStore, // Usa o RedisStore se configurado, senão o MemoryStore padrão
+  secret: process.env.SESSION_SECRET || 'aK3$sP9!zQ7cTfG2@rX5vY8wZ1uJ0iHSuperSecreto', // Use um segredo forte e único
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === 'production', // Se NODE_ENV não existe, isso é 'false', o que é correto para HTTP dev
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000
+    // No Render, NODE_ENV é 'production' e o tráfego HTTPS é gerenciado pelo proxy.
+    // 'secure: true' garante que o cookie só seja enviado por HTTPS.
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true, // Impede acesso ao cookie via JavaScript no cliente
+    maxAge: EXPIRATION_TIME_MS, // Cookie da sessão dura o mesmo que a credencial
+    sameSite: 'lax' // Proteção contra ataques CSRF. 'lax' é um bom padrão.
+    // A opção 'proxy: true' dentro de cookie pode ser considerada se 'app.set('trust proxy', 1)'
+    // não for suficiente para o Express identificar corretamente que a conexão é segura via proxy.
+    // Geralmente, 'trust proxy' é a configuração primária para isso.
   }
 }));
+// --- FIM DA CONFIGURAÇÃO DA SESSÃO ---
 
-// LOG ADICIONAL PARA VERIFICAR NODE_ENV E CONFIGURAÇÃO DO COOKIE SECURE
 const IS_NODE_ENV_PRODUCTION = process.env.NODE_ENV === 'production';
-console.log(`[${new Date().toISOString()}] INFO DE AMBIENTE: process.env.NODE_ENV = '${process.env.NODE_ENV}'. O cookie 'secure' da sessão está configurado como: ${IS_NODE_ENV_PRODUCTION}.`);
-
+console.log(`[<span class="math-inline">\{new Date\(\)\.toISOString\(\)\}\] INFO DE AMBIENTE\: process\.env\.NODE\_ENV \= '</span>{process.env.NODE_ENV}'. O cookie 'secure' da sessão está configurado como: ${IS_NODE_ENV_PRODUCTION}.`);
 
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// ... (o resto do seu código: gerarCredencial, sendTelegramMessageToAdmin, saveCredentialsToFile, cleanupExpiredCredentials, rotas, etc.)
+// NENHUMA OUTRA ALTERAÇÃO NECESSÁRIA NO RESTO DO CÓDIGO PARA ESTE PROBLEMA ESPECÍFICO
 
 function gerarCredencial(tipo) {
   const prefixoUser = "MGL" + tipo.charAt(0).toUpperCase() + tipo.slice(1);
@@ -120,7 +186,7 @@ function cleanupExpiredCredentials() {
         const cred = credenciaisDoTipo[i];
         if (cred && typeof cred === 'object' && cred.createdAt) {
           if (now - cred.createdAt > EXPIRATION_TIME_MS) {
-            console.log(`[${new Date().toISOString()}] Credencial expirada para tipo '${tipo}' (usuário: ${cred.username}) removida pela limpeza periódica.`);
+            console.log(`[<span class="math-inline">\{new Date\(\)\.toISOString\(\)\}\] Credencial expirada para tipo '</span>{tipo}' (usuário: ${cred.username}) removida pela limpeza periódica.`);
             credenciaisDoTipo.splice(i, 1);
             changed = true;
           }
@@ -170,7 +236,7 @@ app.post('/api/login', (req, res) => {
           const isCurrentAttempt = (cred.username === username);
           if (cred.createdAt) {
             if (Date.now() - cred.createdAt > EXPIRATION_TIME_MS) {
-              console.log(`[${new Date().toISOString()}] Credencial expirada (12h) encontrada durante login para tipo '${tipo}' (usuário: ${cred.username}). Removendo. SessionID: ${req.sessionID}`);
+              console.log(`[<span class="math-inline">\{new Date\(\)\.toISOString\(\)\}\] Credencial expirada \(12h\) encontrada durante login para tipo '</span>{tipo}' (usuário: ${cred.username}). Removendo. SessionID: ${req.sessionID}`);
               credenciaisDoTipo.splice(i, 1);
               i--;
               saveCredentialsToFile();
@@ -214,7 +280,7 @@ app.post('/api/login', (req, res) => {
     } else if (tipoLogado === "temp") {
       redirectPath = "/generic-dashboard.html";
     } else {
-      console.warn(`[${new Date().toISOString()}] Tipo de login '${tipoLogado}' não tem redirecionamento específico. Usando dashboard genérico. SessionID: ${req.sessionID}`);
+      console.warn(`[<span class="math-inline">\{new Date\(\)\.toISOString\(\)\}\] Tipo de login '</span>{tipoLogado}' não tem redirecionamento específico. Usando dashboard genérico. SessionID: ${req.sessionID}`);
       redirectPath = "/generic-dashboard.html";
     }
     console.log(`[${new Date().toISOString()}] Login bem-sucedido para usuário: ${username}, tipo: ${tipoLogado}, redirecionando para: ${redirectPath}. SessionID: ${req.sessionID}`);
@@ -242,7 +308,7 @@ app.post('/confirm-payment', async (req, res) => {
   } else if (upperProduct.includes('SPORTINGBOT')) {
     tipoCredencialParaGerar = 'bet';
   } else {
-    console.warn(`[${new Date().toISOString()}] Produto '${product}' não mapeado para um tipo de credencial conhecido (pack, casino, bet). Usando 'temp'.`);
+    console.warn(`[<span class="math-inline">\{new Date\(\)\.toISOString\(\)\}\] Produto '</span>{product}' não mapeado para um tipo de credencial conhecido (pack, casino, bet). Usando 'temp'.`);
     tipoCredencialParaGerar = 'temp';
   }
 
@@ -258,7 +324,7 @@ app.post('/confirm-payment', async (req, res) => {
   credentials[tipoCredencialParaGerar].push(newCredential);
 
   saveCredentialsToFile();
-  console.log(`[${new Date().toISOString()}] Credencial para tipo '${tipoCredencialParaGerar}' (usuário: ${newCredential.username}) adicionada à lista em ${CREDENTIALS_FILE_PATH} com timestamp de criação.`);
+  console.log(`[<span class="math-inline">\{new Date\(\)\.toISOString\(\)\}\] Credencial para tipo '</span>{tipoCredencialParaGerar}' (usuário: ${newCredential.username}) adicionada à lista em ${CREDENTIALS_FILE_PATH} com timestamp de criação.`);
 
   const telegramAdminMessage = `
   Nova Venda Confirmada! 🎉
@@ -438,11 +504,13 @@ app.use((err, req, res, next) => {
 });
 
 cleanupExpiredCredentials();
-setInterval(cleanupExpiredCredentials, 60 * 60 * 1000);
+setInterval(cleanupExpiredCredentials, 60 * 60 * 1000); // Limpeza a cada hora
 
 app.listen(PORT, () => {
-  console.log(`[${new Date().toISOString()}] Servidor rodando na porta ${PORT} - http://localhost:${PORT}`);
-  console.warn(`[${new Date().toISOString()}] ATENÇÃO: Usando MemoryStore para sessões. Não recomendado para produção!`);
+  console.log(`[${new Date().toISOString()}] Servidor rodando na porta <span class="math-inline">\{PORT\} \- http\://localhost\:</span>{PORT}`);
+  if (!redisStore) { // Mostra o aviso do MemoryStore apenas se o Redis não estiver configurado
+      console.warn(`[${new Date().toISOString()}] ATENÇÃO: Usando MemoryStore para sessões. Não recomendado para produção!`);
+  }
   console.log(`[${new Date().toISOString()}] Credenciais temporárias (12h) expirarão após ${EXPIRATION_TIME_MS / (60 * 60 * 1000)} horas.`);
   console.log(`[${new Date().toISOString()}] Sessão em páginas VIP específicas expirará após ${VIP_SECTION_TIMEOUT_MS / (60 * 1000)} minutos de entrada na seção.`);
   console.log(`[${new Date().toISOString()}] Limpeza periódica de credenciais configurada para rodar a cada hora.`);

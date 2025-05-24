@@ -7,12 +7,42 @@
   <title>CASINOBOT</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" type="image/x-icon" href="imagens/favicon.ico">
+  <style>
+    /* Estilos para o header e o botão de login */
+    header {
+      display: flex; /* Ativa o Flexbox */
+      justify-content: space-between; /* Coloca o máximo de espaço entre os filhos (título na esquerda, botão na direita) */
+      align-items: center; /* Alinha os itens verticalmente ao centro */
+      padding: 20px 40px; /* Espaçamento interno do header */
+      position: relative; 
+    }
+
+    .header-login-btn {
+      display: inline-block;
+      padding: 10px 20px;
+      /* margin-left: 20px; */ /* Removido, pois o space-between cuidará do espaçamento */
+      background-color: #4CAF50; /* Cor de fundo verde */
+      color: white; /* Cor do texto */
+      text-decoration: none; /* Remove sublinhado do link */
+      border-radius: 5px; /* Bordas arredondadas */
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      /* vertical-align: middle; */ /* Não é mais necessário com flexbox align-items: center no pai */
+    }
+
+    .header-login-btn:hover {
+      background-color: #45a049; /* Cor de fundo mais escura ao passar o mouse */
+    }
+  </style>
 </head>
 
 <body>
 
   <header>
     <h1>M<span>G</span>L</h1>
+    <a href="login.html" class="header-login-btn">Login</a>
   </header>
 
   <section class="intro">
