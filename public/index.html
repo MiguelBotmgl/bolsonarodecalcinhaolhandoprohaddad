@@ -4,9 +4,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Transforme suas apostas em lucro com inteligência automatizada.">
   <title>CASINOBOT</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="icon" type="image/x-icon" href="imagens/favicon.ico">
+  <link rel="icon" type="image/x-icon" href="imagens/favicon.ico" />
 </head>
 
 <body>
@@ -33,22 +34,37 @@
 
   <section class="floating-icons">
     <div class="icon-box">
-      <img src="imagens/alterada 1.jpg" alt="Ícone 100% Automático" oncontextmenu="return false;" />
+      <img src="imagens/alterada 1.jpg" alt="Ícone 100% Automático" />
       <p>100% Automático</p>
     </div>
     <div class="icon-box">
-      <img src="imagens/alterada 3.jpg" alt="Ícone Resultados Reais" oncontextmenu="return false;" />
+      <img src="imagens/alterada 3.jpg" alt="Ícone Resultados Reais" />
       <p>Resultados Reais</p>
     </div>
     <div class="icon-box">
-      <img src="imagens/alterada2 (2).jpg" alt="Ícone Suporte VIP" oncontextmenu="return false;" />
+      <img src="imagens/alterada2 (2).jpg" alt="Ícone Suporte VIP" />
       <p>Suporte VIP</p>
+    </div>
+  </section>
+
+  <section class="free-groups-section">
+    <h3>Acesse Nossos Grupos <span>GRATUITOS</span>!</h3>
+    <p>Insira seu nome e email para receber o link de acesso e ficar por dentro das novidades e ofertas VIP.</p>
+    <div class="free-groups-buttons">
+      <button class="free-group-btn" data-group-name="Grupo Free Casino Signals"
+        data-group-link="https://t.me/+eOjSjicw7SRmOTgx">
+        Acessar Grupo Free - Casino
+      </button>
+      <button class="free-group-btn" data-group-name="Grupo Free Sporting Tips"
+        data-group-link="https://t.me/mglsportingbotfree">
+        Acessar Grupo Free - Esportes
+      </button>
     </div>
   </section>
 
   <section class="carousel hidden">
     <div class="product active">
-      <img src="imagens/2.png" alt="Produto CASINOBOT VIP" oncontextmenu="return false;" />
+      <img src="imagens/2.png" alt="Produto CASINOBOT VIP" />
       <div class="info">
         <h2>CASINOBOT <span class="vip">VIP</span></h2>
         <p>Faça valores inimagináveis somente com nosso bot de sinais.</p>
@@ -57,7 +73,7 @@
     </div>
 
     <div class="product">
-      <img src="imagens/3.png" alt="Produto SPORTINGBOT VIP" oncontextmenu="return false;" />
+      <img src="imagens/3.png" alt="Produto SPORTINGBOT VIP" />
       <div class="info">
         <h2>SPORTINGBOT <span class="vip">VIP</span></h2>
         <p>Faça valores inimagináveis somente com nosso bot de palpites.</p>
@@ -66,7 +82,7 @@
     </div>
 
     <div class="product">
-      <img src="imagens/pack.png" alt="Produto PACK CASINOBOT + SPORTINGBOT VIP" oncontextmenu="return false;" />
+      <img src="imagens/pack.png" alt="Produto PACK CASINOBOT + SPORTINGBOT VIP" />
       <div class="info">
         <h2>PACK CASINOBOT + SPORTINGBOT <span class="vip">VIP</span></h2>
         <p>Potencialize seus ganhos com nossos bots de apostas esportivas e casino.</p>
@@ -79,9 +95,137 @@
   </section>
 
   <footer>
+    <!-- Rodapé aqui se necessário -->
   </footer>
 
+  <!-- Modal -->
+  <div id="freeGroupModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn">&times;</span>
+      <h3 id="modalTitle">Acesso ao Grupo Gratuito</h3>
+      <p>Para acessar o <strong id="modalGroupNameText">grupo</strong>, por favor, informe seu nome e email. Você também
+        receberá informações sobre nossos planos VIP!</p>
+      <form id="freeGroupForm">
+        <input type="text" id="userName" name="userName" placeholder="Seu Nome Completo" required />
+        <input type="email" id="userEmail" name="userEmail" placeholder="Seu Melhor Email" required />
+        <button type="submit" id="submitFreeGroupBtn">Registrar e Acessar</button>
+        <p id="modalMessage" class="modal-message-placeholder"></p>
+      </form>
+    </div>
+  </div>
+
   <script src="script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const modal = document.getElementById('freeGroupModal');
+      const modalTitleElement = document.getElementById('modalTitle');
+      const modalGroupNameTextElement = document.getElementById('modalGroupNameText');
+      const closeModalBtn = modal.querySelector('.close-btn');
+      const freeGroupRegistrationForm = document.getElementById('freeGroupForm');
+      const allFreeGroupButtons = document.querySelectorAll('.free-group-btn');
+      const modalUserMessage = document.getElementById('modalMessage');
+      const submitRegistrationBtn = document.getElementById('submitFreeGroupBtn');
+
+      let activeGroupName = '';
+      let activeGroupLink = '';
+
+      allFreeGroupButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          activeGroupName = button.dataset.groupName;
+          activeGroupLink = button.dataset.groupLink;
+
+          modalTitleElement.textContent = `Acesso ao ${activeGroupName}`;
+          modalGroupNameTextElement.textContent = activeGroupName;
+
+          modalUserMessage.textContent = '';
+          modalUserMessage.className = 'modal-message-placeholder';
+          freeGroupRegistrationForm.reset();
+          submitRegistrationBtn.disabled = false;
+          submitRegistrationBtn.textContent = 'Registrar e Acessar';
+
+          modal.style.display = 'block';
+        });
+      });
+
+      closeModalBtn.onclick = () => {
+        modal.style.display = 'none';
+      }
+
+      window.onclick = (event) => {
+        if (event.target === modal) {
+          modal.style.display = 'none';
+        }
+      }
+
+      freeGroupRegistrationForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        const userNameInput = document.getElementById('userName').value.trim();
+        const userEmailInput = document.getElementById('userEmail').value.trim();
+
+        if (!userNameInput || !userEmailInput) {
+          modalUserMessage.textContent = 'Por favor, preencha nome e email.';
+          modalUserMessage.className = 'modal-message-error';
+          return;
+        }
+
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(userEmailInput)) {
+          modalUserMessage.textContent = 'Formato de email inválido.';
+          modalUserMessage.className = 'modal-message-error';
+          return;
+        }
+
+        submitRegistrationBtn.disabled = true;
+        submitRegistrationBtn.textContent = 'Enviando...';
+        modalUserMessage.textContent = '';
+        modalUserMessage.className = 'modal-message-placeholder';
+
+        try {
+          const apiResponse = await fetch('/api/register-free-group', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: userNameInput,
+              email: userEmailInput,
+              groupName: activeGroupName
+            })
+          });
+
+          const responseData = await apiResponse.json();
+
+          if (apiResponse.ok && responseData.success) {
+            modalUserMessage.textContent = responseData.message + ' Redirecionando para o grupo...';
+            modalUserMessage.className = 'modal-message-success';
+
+            if (activeGroupLink && (activeGroupLink.startsWith('http://') || activeGroupLink.startsWith('https://'))) {
+              setTimeout(() => {
+                window.location.href = activeGroupLink;
+              }, 3000);
+            } else {
+              modalUserMessage.textContent = 'Link do grupo configurado incorretamente. Contate o suporte. Você receberá um email sobre o VIP.';
+              modalUserMessage.className = 'modal-message-error';
+              setTimeout(() => {
+                modal.style.display = 'none';
+              }, 5000);
+            }
+
+          } else {
+            modalUserMessage.textContent = responseData.message || 'Falha no registro. Tente novamente.';
+            modalUserMessage.className = 'modal-message-error';
+            submitRegistrationBtn.disabled = false;
+            submitRegistrationBtn.textContent = 'Registrar e Acessar';
+          }
+
+        } catch (error) {
+          console.error("Erro ao submeter formulário do grupo free:", error);
+          modalUserMessage.textContent = "Erro na comunicação. Verifique sua conexão e tente novamente.";
+          modalUserMessage.className = 'modal-message-error';
+          submitRegistrationBtn.disabled = false;
+          submitRegistrationBtn.textContent = 'Registrar e Acessar';
+        }
+      });
+    });
+  </script>
 
 </body>
 

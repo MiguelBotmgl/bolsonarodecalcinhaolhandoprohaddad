@@ -3,27 +3,18 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
-
-// --- NOVAS IMPORTAÇÕES PARA SESSÃO COM REDIS ---
 const session = require('express-session');
-const RedisStore = require("connect-redis").default; // CORREÇÃO APLICADA AQUI
-const { createClient } = require("redis");
-// --- FIM DAS NOVAS IMPORTAÇÕES ---
+const nodemailer = require('nodemailer'); // <-- ADDED for email
 
 const app = express();
-
-// --- CONFIGURAR PARA CONFIAR NO PROXY DO RENDER ---
-app.set('trust proxy', 1);
-// --- FIM DA CONFIGURAÇÃO DO PROXY ---
-
 const PORT = process.env.PORT || 3000;
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
 const CREDENTIALS_FILE_PATH = './credentials.json';
-const EXPIRATION_TIME_MS = 12 * 60 * 60 * 1000;
-const VIP_SECTION_TIMEOUT_MS = 5 * 60 * 1000;
+const EXPIRATION_TIME_MS = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
+const VIP_SECTION_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes for specific VIP pages
 
 let credentials = {};
 try {
@@ -50,66 +41,82 @@ try {
   }
 }
 
-// --- CONFIGURAÇÃO DA SESSÃO COM REDIS ---
-let redisClient;
-let redisStore;
-
-if (process.env.REDIS_URL) {
-  redisClient = createClient({
-    url: process.env.REDIS_URL,
-    socket: {
-      keepAlive: 5000,
-      connectTimeout: 10000
-    }
-  });
-
-  redisClient.connect().catch(err => {
-    console.error(`[${new Date().toISOString()}] Erro inicial ao conectar ao Redis:`, err);
-  });
-
-  redisClient.on('error', function (err) {
-    console.error(`[${new Date().toISOString()}] Erro de cliente Redis:`, err);
-  });
-  redisClient.on('connect', function () {
-    console.log(`[${new Date().toISOString()}] Conectado ao servidor Redis para sessões.`);
-  });
-  redisClient.on('ready', function () {
-    console.log(`[${new Date().toISOString()}] Cliente Redis pronto para uso.`);
-  });
-  redisClient.on('end', function () {
-    console.log(`[${new Date().toISOString()}] Conexão com Redis fechada.`);
-  });
-
-
-  redisStore = new RedisStore({
-    client: redisClient,
-    prefix: "mglapp-session:",
-    disableTouch: true
-  });
-  console.log(`[${new Date().toISOString()}] Usando Redis para armazenamento de sessão.`);
-} else {
-  console.warn(`[${new Date().toISOString()}] ATENÇÃO: REDIS_URL não configurada. Usando MemoryStore para sessões (não recomendado para produção).`);
-}
-
 app.use(session({
-  store: redisStore,
-  secret: process.env.SESSION_SECRET || 'aK3$sP9!zQ7cTfG2@rX5vY8wZ1uJ0iHSuperSecreto',
+  secret: process.env.SESSION_SECRET || 'aK3$sP9!zQ7cTfG2@rX5vY8wZ1uJ0iH', // Consider using a more complex secret from .env
   resave: false,
   saveUninitialized: false,
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
-    maxAge: EXPIRATION_TIME_MS,
-    sameSite: 'lax'
+    maxAge: 24 * 60 * 60 * 1000 // Session cookie itself lasts 24 hours
   }
 }));
-// --- FIM DA CONFIGURAÇÃO DA SESSÃO ---
-
-const IS_NODE_ENV_PRODUCTION = process.env.NODE_ENV === 'production';
-console.log(`[${new Date().toISOString()}] INFO DE AMBIENTE: process.env.NODE_ENV = '${process.env.NODE_ENV}'. O cookie 'secure' da sessão está configurado como: ${IS_NODE_ENV_PRODUCTION}.`);
 
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+
+// --- NODEMAILER TRANSPORTER SETUP ---
+let transporter;
+if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+  transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: parseInt(process.env.SMTP_PORT || "587", 10),
+    secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+    tls: {
+      rejectUnauthorized: process.env.NODE_ENV === 'production'
+    }
+  });
+  console.log(`[${new Date().toISOString()}] Nodemailer transporter configurado.`);
+} else {
+  console.warn(`[${new Date().toISOString()}] ATENÇÃO: SMTP_HOST, SMTP_USER, ou SMTP_PASS não configurados no .env. O envio de email estará desabilitado.`);
+}
+
+async function sendVipInfoEmail(name, email) {
+  if (!transporter) {
+    console.warn(`[${new Date().toISOString()}] Nodemailer não configurado. Pulando envio de email para ${email}.`);
+    return;
+  }
+
+  const mailOptions = {
+    from: process.env.SMTP_FROM_EMAIL || `"MGL Bots" <noreply@example.com>`,
+    to: email,
+    subject: '✨ Informações Especiais do Grupo VIP MGL Bots! ✨',
+    html: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <div style="max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9;">
+          <h2 style="color: #5a0081; text-align: center;">Olá ${name},</h2>
+          <p style="font-size: 16px;">Agradecemos por seu interesse e por se registrar para acessar nosso conteúdo gratuito!</p>
+          <p style="font-size: 16px;">Quer elevar sua experiência e resultados a um novo patamar? Nosso <strong>Grupo VIP MGL Bots</strong> oferece vantagens exclusivas que farão toda a diferença:</p>
+          <ul style="font-size: 16px; list-style-type: disc; padding-left: 20px;">
+            <li>🤖 Sinais e palpites premium com maior assertividade.</li>
+            <li>🚀 Acesso antecipado a novas funcionalidades e bots.</li>
+            <li>💎 Conteúdo exclusivo e estratégias avançadas.</li>
+            <li>🤝 Suporte prioritário e personalizado.</li>
+            <li>📈 Comunidade VIP para networking e troca de experiências.</li>
+          </ul>
+          <p style="font-size: 16px;">Não perca a oportunidade de se juntar à elite e maximizar seus ganhos!</p>
+          <p style="text-align: center; margin-top: 30px;">
+            <a href="mglbots.online" style="background-color: #00c67c; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-size: 18px; font-weight: bold;">Quero Ser VIP Agora!</a>
+          </p>
+          <p style="font-size: 14px; color: #555; margin-top: 30px;">Atenciosamente,<br>Equipe MGL Bots</p>
+        </div>
+      </div>
+    `
+  };
+
+  try {
+    let info = await transporter.sendMail(mailOptions);
+    console.log(`[${new Date().toISOString()}] Email com informações VIP enviado para ${email}: ${info.messageId}`);
+  } catch (error) {
+    console.error(`[${new Date().toISOString()}] Erro ao enviar email com informações VIP para ${email}:`, error);
+  }
+}
+// --- END OF NODEMAILER ---
 
 
 function gerarCredencial(tipo) {
@@ -187,26 +194,65 @@ function cleanupExpiredCredentials() {
 }
 
 app.get('/', (req, res) => {
-  res.redirect('/site_vip/index.html');
+  res.redirect('/site_vip/index.html'); //
 });
 
 app.get('/login.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
+// ... (outras rotas GET existentes como pagamento.html, confirmado.html, etc.) ...
 app.get('/pagamento.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'pagamento.html'));
+  res.sendFile(path.join(__dirname, 'public', 'pagamento.html')); //
 });
 
 app.get('/confirmado.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'confirmado.html'));
+  res.sendFile(path.join(__dirname, 'public', 'confirmado.html')); //
 });
 
 app.get('/cancelamento.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'cancelamento.html'));
+  res.sendFile(path.join(__dirname, 'public', 'cancelamento.html')); //
 });
 
+
+// --- NEW ENDPOINT for Free Group Registration ---
+app.post('/api/register-free-group', async (req, res) => {
+  const { name, email, groupName } = req.body;
+
+  if (!name || !email || !groupName) {
+    return res.status(400).json({ success: false, message: 'Nome, email e nome do grupo são obrigatórios.' });
+  }
+
+  // Basic email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ success: false, message: 'Formato de email inválido.' });
+  }
+
+  console.log(`[${new Date().toISOString()}] Novo registro para grupo free: ${groupName}. Nome: ${name}, Email: ${email}`);
+
+  // Send email with VIP info
+  // This function now checks if 'transporter' is configured
+  await sendVipInfoEmail(name, email);
+
+  // Notify admin via Telegram
+  const telegramAdminMessage = `
+  📝 Novo Registro para Grupo Free!
+  👥 Grupo: ${groupName}
+  👤 Nome: ${name}
+  📧 Email: ${email}
+  `;
+  await sendTelegramMessageToAdmin(telegramAdminMessage);
+
+  // Optionally, save this information to a file or database here if needed.
+
+  res.json({ success: true, message: 'Registro efetuado com sucesso! Você receberá um email com mais informações sobre nossos planos VIP em breve.' });
+});
+// --- END OF NEW ENDPOINT ---
+
+
 app.post('/api/login', (req, res) => {
+  // ... (seu código de login existente, não precisa mudar para esta funcionalidade) ...
   const { username, password } = req.body;
   let tipoLogado = null;
   let credencialEncontrada = null;
@@ -255,7 +301,7 @@ app.post('/api/login', (req, res) => {
     req.session.loggedIn = true;
     req.session.userType = tipoLogado;
     req.session.username = credencialEncontrada.username;
-    delete req.session.vipSectionEntryTimestamp;
+    delete req.session.vipSectionEntryTimestamp; // Clear VIP timer on new login
 
     let redirectPath;
     if (tipoLogado === "packvip" || tipoLogado === "pack") {
@@ -279,6 +325,7 @@ app.post('/api/login', (req, res) => {
 });
 
 app.post('/confirm-payment', async (req, res) => {
+  // ... (seu código de confirmação de pagamento existente) ...
   const { name, phone, product } = req.body;
 
   if (!name || !phone || !product) {
@@ -329,6 +376,9 @@ app.post('/confirm-payment', async (req, res) => {
   res.json({ success: true, message: 'Pagamento confirmado, credenciais geradas (válidas por 12 horas) e informações enviadas!' });
 });
 
+
+// --- Middleware de autenticação e rotas protegidas ---
+// ... (seu código isAuthenticated, handleVipSectionAccess, rotas protegidas, logout, etc., existente) ...
 function isAuthenticated(req, res, next) {
   console.log(`[${new Date().toISOString()}] isAuthenticated CALLED for path: ${req.path}. SessionID: ${req.sessionID}, LoggedIn: ${req.session ? req.session.loggedIn : 'N/A'}, User: ${req.session ? req.session.username : 'N/A'}`);
   if (req.session && req.session.loggedIn && req.session.username && req.session.userType) {
@@ -462,6 +512,8 @@ app.get('/logout', (req, res) => {
   });
 });
 
+// Error handling (404 and 500)
+// ... (seu código de error handling existente) ...
 app.use((req, res, next) => {
   const filePath = path.join(__dirname, 'public', '404.html');
   console.log(`[${new Date().toISOString()}] Rota não encontrada: ${req.path}. Tentando servir 404.html.`);
@@ -495,8 +547,12 @@ setInterval(cleanupExpiredCredentials, 60 * 60 * 1000);
 
 app.listen(PORT, () => {
   console.log(`[${new Date().toISOString()}] Servidor rodando na porta ${PORT} - http://localhost:${PORT}`);
-  if (!redisStore) {
-    console.warn(`[${new Date().toISOString()}] ATENÇÃO: Usando MemoryStore para sessões. Não recomendado para produção!`);
+  // This check for redisStore is removed as you are using MemoryStore based on the provided server.js
+  // if (!redisStore) { // This logic might differ if you're using Redis again
+  //   console.warn(`[${new Date().toISOString()}] ATENÇÃO: Usando MemoryStore para sessões. Não recomendado para produção!`);
+  // }
+  if (process.env.NODE_ENV !== 'production') { // General warning for MemoryStore in non-production
+    console.warn(`[${new Date().toISOString()}] ATENÇÃO: Usando MemoryStore para sessões (padrão). Não recomendado para produção! Considere um session store persistente como connect-redis se aplicável.`);
   }
   console.log(`[${new Date().toISOString()}] Credenciais temporárias (12h) expirarão após ${EXPIRATION_TIME_MS / (60 * 60 * 1000)} horas.`);
   console.log(`[${new Date().toISOString()}] Sessão em páginas VIP específicas expirará após ${VIP_SECTION_TIMEOUT_MS / (60 * 1000)} minutos de entrada na seção.`);

@@ -12,11 +12,10 @@
   "description": "",
   "dependencies": {
     "body-parser": "^2.2.0",
-    "connect-redis": "^8.1.0",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "express-session": "^1.18.1",
-    "redis": "^5.1.0",
+    "nodemailer": "^6.10.1",
     "twilio": "^5.6.1"
   }
 }
