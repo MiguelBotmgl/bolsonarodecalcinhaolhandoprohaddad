@@ -290,7 +290,7 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const urlParams = new URLSearchParams(window.location.search);
-      const product = urlParams.get('product');
+      const productQueryParam = urlParams.get('product'); // Get product from URL query
       const productNameElement = document.getElementById('productName');
       const qrCodeImageElement = document.getElementById('qrCodeImage');
       const paymentForm = document.getElementById('paymentForm');
@@ -305,27 +305,26 @@
         e.target.value = value;
       });
 
-      let displayProductName = '';
+      let displayProductName = ''; // This will be sent to the backend and used for display
       let qrImagePath = '';
       let pixCopyPasteCode = '';
 
-      // !! IMPORTANTE: Substitua pelos seus códigos PIX e caminhos de imagem reais !!
-      // E TAMBÉM OS NOMES DOS PRODUTOS EXATAMENTE COMO USADO NO BACKEND PARA GERAR CREDENCIAIS
-      if (product === 'casino') { // Este 'casino' deve corresponder ao ?product=casino na URL
-        displayProductName = 'CASINOBOT'; // Nome do produto para exibição e enviado ao backend
+      // Determine product details based on the 'product' query parameter
+      if (productQueryParam === 'casino') {
+        displayProductName = 'CASINOBOT'; // Matches the value expected by backend
         qrImagePath = 'imagens/qr-casino.png';
         pixCopyPasteCode = 'SEU_CODIGO_PIX_COPIA_E_COLA_CASINO';
-      } else if (product === 'sporting') { // Este 'sporting' deve corresponder ao ?product=sporting na URL
-        displayProductName = 'SPORTINGBOT'; // Nome do produto para exibição e enviado ao backend
+      } else if (productQueryParam === 'sporting') {
+        displayProductName = 'SPORTINGBOT'; // Matches the value expected by backend
         qrImagePath = 'imagens/qr-sporting.png';
         pixCopyPasteCode = 'SEU_CODIGO_PIX_COPIA_E_COLA_SPORTING';
-      } else if (product === 'pack') { // Este 'pack' deve corresponder ao ?product=pack na URL
-        displayProductName = 'PACK CASINOBOT + SPORTINGBOT'; // Nome do produto para exibição e enviado ao backend
+      } else if (productQueryParam === 'pack') {
+        displayProductName = 'PACK CASINOBOT + SPORTINGBOT'; // Matches the value expected by backend
         qrImagePath = 'imagens/qr-pack.png';
         pixCopyPasteCode = 'SEU_CODIGO_PIX_COPIA_E_COLA_PACK';
       } else {
         displayProductName = 'Produto Indisponível';
-        qrImagePath = 'imagens/qr-default.png';
+        qrImagePath = 'imagens/qr-default.png'; // A default/error QR image
         pixCopyPasteCode = 'NENHUM_CODIGO_DISPONIVEL';
         productNameElement.style.color = 'red';
         if (copyPixButton) copyPixButton.style.display = 'none';
@@ -401,19 +400,21 @@
         submitButton.textContent = 'Processando...';
 
         try {
-          // ESTA É A PARTE CORRIGIDA E IMPORTANTE:
-          const response = await fetch('/confirm-payment', { // Chamada real para o backend
+          const response = await fetch('/confirm-payment', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            // Garanta que `displayProductName` aqui seja o valor que o backend espera para `product`
+            // Send displayProductName as 'product' to the backend
             body: JSON.stringify({ name, phone: fullPhoneNumber, product: displayProductName }),
           });
-          const data = await response.json();
+          const data = await response.json(); // data is the response from /confirm-payment
 
-          if (response.ok && data.success) { // Verifica se a requisição HTTP foi OK e o success do JSON
-            window.location.href = `confirmado.html?product=${encodeURIComponent(product || 'unknown')}&name=${encodeURIComponent(name)}`;
+          if (response.ok && data.success) {
+            // *** MODIFIED LINE FOR REDIRECTION ***
+            // Pass product (original from query, or displayProductName if more reliable), name,
+            // and the username, password, and redirect URL received from the server (data.redirect)
+            window.location.href = `confirmado.html?product=${encodeURIComponent(displayProductName)}&name=${encodeURIComponent(name)}&username=${encodeURIComponent(data.username)}&password=${encodeURIComponent(data.password)}&redirectUrl=${encodeURIComponent(data.redirect)}`;
           } else {
             alert(data.message || 'Erro ao confirmar pagamento. Verifique os dados e tente novamente.');
           }
