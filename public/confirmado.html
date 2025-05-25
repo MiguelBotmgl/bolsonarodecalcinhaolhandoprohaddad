@@ -4,20 +4,112 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Pagamento Confirmado - CASINOBOT</title>
-  <link rel="stylesheet" href="style3.css">
+  <title>Pagamento Confirmado - MGL BOTS</title>
+  <link rel="stylesheet" href="style3.css"> 
   <link rel="icon" type="image/x-icon" href="imagens/favicon.ico">
+  <style>
+    /* Estilos adicionais para esta página, se necessário */
+    body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(-45deg, #000000, #5a0081, #3a0066, #1a001f);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        text-align: center;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .confirmation-container {
+        background-color: rgba(0,0,0,0.6);
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0,192,100,0.5);
+    }
+    .confirmation-container h1 { color: #00c67c; margin-bottom: 15px; }
+    .confirmation-container p { margin-bottom: 10px; font-size: 1.1em; }
+    .credentials-box {
+        background-color: rgba(255,255,255,0.1);
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 5px;
+        border: 1px dashed #00c67c;
+    }
+    .credentials-box p { margin-bottom: 8px; }
+    .action-button {
+        display: inline-block;
+        padding: 12px 25px;
+        background-color: #00c67c;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 1.1em;
+        font-weight: bold;
+        margin-top: 20px;
+        transition: background-color 0.3s;
+    }
+    .action-button:hover { background-color: #00a568; }
+  </style>
 </head>
 
 <body>
-  <div>
+  <div class="confirmation-container">
     <h1>Pagamento Confirmado!</h1>
-    <p>Obrigado pela sua compra. Você receberá as credenciais de entrada o mais rápido possível!</p>
-    <a href="login.html" class="login-button">Ir para a Tela de Login</a>
-  </div>
+    <p>Obrigado pela sua compra, <strong id="customerName">Cliente</strong>!</p>
+    <p>Seu acesso ao <strong id="purchasedProduct">Produto VIP</strong> foi liberado.</p>
+    
+    <div id="credentialsDisplay" class="credentials-box" style="display: none;">
+      <p><strong>Suas credenciais de acesso (válidas por 12 horas):</strong></p>
+      <p>Usuário: <strong id="displayUsername"></strong></p>
+      <p>Senha: <strong id="displayPassword"></strong></p>
+      <p><em>Anote essas informações em um local seguro!</em></p>
+    </div>
+    
+    <a href="#" id="accessVipButton" class="action-button" style="display: none;">Acessar Área VIP Agora</a>
+    <a href="login.html" id="loginFallbackButton" class="action-button" style="display: block;">Ir para Login (se não for redirecionado)</a> </div>
 
-  <script src="script2.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const name = params.get('name');
+      const product = params.get('product');
+      const username = params.get('username');
+      const password = params.get('password');
+      const redirectUrl = params.get('redirectUrl'); // URL da página protegida
+
+      if (name) document.getElementById('customerName').textContent = name;
+      if (product) document.getElementById('purchasedProduct').textContent = product;
+      
+      const credentialsDiv = document.getElementById('credentialsDisplay');
+      const accessButton = document.getElementById('accessVipButton');
+      const loginFallbackButton = document.getElementById('loginFallbackButton');
+
+      if (username && password) {
+        document.getElementById('displayUsername').textContent = username;
+        document.getElementById('displayPassword').textContent = password;
+        credentialsDiv.style.display = 'block';
+      }
+
+      if (redirectUrl) {
+        accessButton.href = redirectUrl;
+        accessButton.style.display = 'inline-block';
+        loginFallbackButton.style.display = 'none'; // Esconde o fallback se o botão de acesso direto estiver presente
+        
+        // Opcional: redirecionar automaticamente após exibir as credenciais por um tempo
+        // setTimeout(() => {
+        //    window.location.href = redirectUrl;
+        // }, 7000); // 7 segundos de delay
+      }
+    });
+  </script>
 
 </body>
-
 </html>

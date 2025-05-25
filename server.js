@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 const session = require('express-session');
-const nodemailer = require('nodemailer'); // <-- ADDED for email
+const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -18,7 +18,7 @@ const VIP_SECTION_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes for specific VIP page
 
 let credentials = {};
 try {
-  const rawCredentialsData = fs.readFileSync(CREDENTIALS_FILE_PATH, 'utf8');
+  const rawCredentialsData = fs.readFileSync(CREDENTIALS_FILE_PATH, 'utf8'); //
   const parsedJson = JSON.parse(rawCredentialsData);
   for (const tipo in parsedJson) {
     if (Object.prototype.hasOwnProperty.call(parsedJson, tipo)) {
@@ -42,13 +42,13 @@ try {
 }
 
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'aK3$sP9!zQ7cTfG2@rX5vY8wZ1uJ0iH', // Consider using a more complex secret from .env
+  secret: process.env.SESSION_SECRET || 'aK3$sP9!zQ7cTfG2@rX5vY8wZ1uJ0iH',
   resave: false,
   saveUninitialized: false,
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 // Session cookie itself lasts 24 hours
+    maxAge: 24 * 60 * 60 * 1000
   }
 }));
 
@@ -62,7 +62,7 @@ if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
   transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: parseInt(process.env.SMTP_PORT || "587", 10),
-    secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
+    secure: process.env.SMTP_SECURE === 'true',
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
@@ -101,7 +101,7 @@ async function sendVipInfoEmail(name, email) {
           </ul>
           <p style="font-size: 16px;">Não perca a oportunidade de se juntar à elite e maximizar seus ganhos!</p>
           <p style="text-align: center; margin-top: 30px;">
-            <a href="mglbots.online" style="background-color: #00c67c; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-size: 18px; font-weight: bold;">Quero Ser VIP Agora!</a>
+            <a href="https://mglbots.online" style="background-color: #00c67c; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-size: 18px; font-weight: bold;">Quero Ser VIP Agora!</a>
           </p>
           <p style="font-size: 14px; color: #555; margin-top: 30px;">Atenciosamente,<br>Equipe MGL Bots</p>
         </div>
@@ -143,7 +143,7 @@ async function sendTelegramMessageToAdmin(message) {
   }
   const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
   try {
-    const response = await fetch(url, {
+    const response = await fetch(url, { // Uso global de fetch, não precisa de import específico
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message, parse_mode: 'Markdown' }),
@@ -178,12 +178,18 @@ function cleanupExpiredCredentials() {
     if (Array.isArray(credenciaisDoTipo)) {
       for (let i = credenciaisDoTipo.length - 1; i >= 0; i--) {
         const cred = credenciaisDoTipo[i];
-        if (cred && typeof cred === 'object' && cred.createdAt) {
+        if (cred && typeof cred === 'object' && cred.createdAt) { // Verifica se createdAt existe
           if (now - cred.createdAt > EXPIRATION_TIME_MS) {
             console.log(`[${new Date().toISOString()}] Credencial expirada para tipo '${tipo}' (usuário: ${cred.username}) removida pela limpeza periódica.`);
             credenciaisDoTipo.splice(i, 1);
             changed = true;
           }
+        } else if (cred && typeof cred === 'object' && !cred.createdAt) {
+          // Adiciona createdAt se não existir, para credenciais antigas sem ele
+          // Isso ajuda a evitar que credenciais sem createdAt sejam consideradas sempre válidas
+          console.log(`[${new Date().toISOString()}] Adicionando createdAt para credencial antiga (usuário: ${cred.username}, tipo: ${tipo}).`);
+          cred.createdAt = now; // Ou um valor que as torne elegíveis para expiração em breve
+          changed = true;
         }
       }
     }
@@ -194,14 +200,13 @@ function cleanupExpiredCredentials() {
 }
 
 app.get('/', (req, res) => {
-  res.redirect('/site_vip/index.html'); //
+  res.redirect('/site_vip/index.html');
 });
 
 app.get('/login.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+  res.sendFile(path.join(__dirname, 'public', 'login.html')); //
 });
 
-// ... (outras rotas GET existentes como pagamento.html, confirmado.html, etc.) ...
 app.get('/pagamento.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'pagamento.html')); //
 });
@@ -215,7 +220,7 @@ app.get('/cancelamento.html', (req, res) => {
 });
 
 
-// --- NEW ENDPOINT for Free Group Registration ---
+// --- ENDPOINT for Free Group Registration ---
 app.post('/api/register-free-group', async (req, res) => {
   const { name, email, groupName } = req.body;
 
@@ -223,19 +228,14 @@ app.post('/api/register-free-group', async (req, res) => {
     return res.status(400).json({ success: false, message: 'Nome, email e nome do grupo são obrigatórios.' });
   }
 
-  // Basic email validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     return res.status(400).json({ success: false, message: 'Formato de email inválido.' });
   }
 
   console.log(`[${new Date().toISOString()}] Novo registro para grupo free: ${groupName}. Nome: ${name}, Email: ${email}`);
-
-  // Send email with VIP info
-  // This function now checks if 'transporter' is configured
   await sendVipInfoEmail(name, email);
 
-  // Notify admin via Telegram
   const telegramAdminMessage = `
   📝 Novo Registro para Grupo Free!
   👥 Grupo: ${groupName}
@@ -244,15 +244,12 @@ app.post('/api/register-free-group', async (req, res) => {
   `;
   await sendTelegramMessageToAdmin(telegramAdminMessage);
 
-  // Optionally, save this information to a file or database here if needed.
-
   res.json({ success: true, message: 'Registro efetuado com sucesso! Você receberá um email com mais informações sobre nossos planos VIP em breve.' });
 });
 // --- END OF NEW ENDPOINT ---
 
 
 app.post('/api/login', (req, res) => {
-  // ... (seu código de login existente, não precisa mudar para esta funcionalidade) ...
   const { username, password } = req.body;
   let tipoLogado = null;
   let credencialEncontrada = null;
@@ -278,6 +275,8 @@ app.post('/api/login', (req, res) => {
               }
               continue;
             }
+          } else { // Se não tem createdAt, é uma credencial antiga, considera-a não expirada por agora, mas loga
+            console.warn(`[${new Date().toISOString()}] Credencial sem createdAt encontrada para usuário: ${cred.username}, tipo: ${tipo}. Considere adicionar createdAt ao gerar.`);
           }
           if (cred.username === username && cred.password === password) {
             tipoLogado = tipo;
@@ -301,7 +300,7 @@ app.post('/api/login', (req, res) => {
     req.session.loggedIn = true;
     req.session.userType = tipoLogado;
     req.session.username = credencialEncontrada.username;
-    delete req.session.vipSectionEntryTimestamp; // Clear VIP timer on new login
+    delete req.session.vipSectionEntryTimestamp;
 
     let redirectPath;
     if (tipoLogado === "packvip" || tipoLogado === "pack") {
@@ -324,8 +323,8 @@ app.post('/api/login', (req, res) => {
   }
 });
 
+// VERSÃO CORRIGIDA DE /confirm-payment
 app.post('/confirm-payment', async (req, res) => {
-  // ... (seu código de confirmação de pagamento existente) ...
   const { name, phone, product } = req.body;
 
   if (!name || !phone || !product) {
@@ -349,7 +348,7 @@ app.post('/confirm-payment', async (req, res) => {
   const newCredentialBase = gerarCredencial(tipoCredencialParaGerar);
   const newCredential = {
     ...newCredentialBase,
-    createdAt: Date.now()
+    createdAt: Date.now() // Adiciona createdAt ao gerar nova credencial
   };
 
   if (!credentials[tipoCredencialParaGerar] || !Array.isArray(credentials[tipoCredencialParaGerar])) {
@@ -373,12 +372,38 @@ app.post('/confirm-payment', async (req, res) => {
   `;
   await sendTelegramMessageToAdmin(telegramAdminMessage);
 
-  res.json({ success: true, message: 'Pagamento confirmado, credenciais geradas (válidas por 12 horas) e informações enviadas!' });
+  // LOGAR O USUÁRIO AUTOMATICAMENTE E DEFINIR REDIRECIONAMENTO
+  req.session.loggedIn = true;
+  req.session.userType = tipoCredencialParaGerar;
+  req.session.username = newCredential.username;
+  delete req.session.vipSectionEntryTimestamp;
+
+  let redirectPath;
+  if (tipoCredencialParaGerar === "packvip" || tipoCredencialParaGerar === "pack") {
+    redirectPath = "/packvip-page.html";
+  } else if (tipoCredencialParaGerar === "casino") {
+    redirectPath = "/casino-page.html";
+  } else if (tipoCredencialParaGerar === "bet") {
+    redirectPath = "/bet-page.html";
+  } else if (tipoCredencialParaGerar === "temp") {
+    redirectPath = "/generic-dashboard.html"; // Certifique-se que está em protected_pages
+  } else {
+    console.warn(`[${new Date().toISOString()}] Tipo de credencial gerada '${tipoCredencialParaGerar}' não tem redirecionamento específico após pagamento. Usando dashboard genérico. SessionID: ${req.sessionID}`);
+    redirectPath = "/generic-dashboard.html"; // Certifique-se que está em protected_pages
+  }
+  console.log(`[${new Date().toISOString()}] Pagamento confirmado para usuário: ${newCredential.username}, tipo: ${tipoCredencialParaGerar}, redirecionando para: ${redirectPath}. SessionID: ${req.sessionID}`);
+
+  res.json({
+    success: true,
+    message: 'Pagamento confirmado, credenciais geradas e acesso liberado!',
+    username: newCredential.username,
+    password: newCredential.password,
+    redirect: redirectPath
+  });
 });
 
 
 // --- Middleware de autenticação e rotas protegidas ---
-// ... (seu código isAuthenticated, handleVipSectionAccess, rotas protegidas, logout, etc., existente) ...
 function isAuthenticated(req, res, next) {
   console.log(`[${new Date().toISOString()}] isAuthenticated CALLED for path: ${req.path}. SessionID: ${req.sessionID}, LoggedIn: ${req.session ? req.session.loggedIn : 'N/A'}, User: ${req.session ? req.session.username : 'N/A'}`);
   if (req.session && req.session.loggedIn && req.session.username && req.session.userType) {
@@ -441,9 +466,7 @@ function handleVipSectionAccess(req, res, pagePath) {
     req.session.destroy(err => {
       if (err) {
         console.error(`[${new Date().toISOString()}] Erro ao destruir sessão por timeout VIP para ${originalUser}:`, err);
-        if (!res.headersSent) {
-          return res.status(500).send("Erro ao fazer logout devido à expiração da sessão VIP.");
-        }
+        if (!res.headersSent) { return res.status(500).send("Erro ao fazer logout devido à expiração da sessão VIP."); }
         return;
       }
       res.clearCookie('connect.sid');
@@ -462,34 +485,26 @@ function handleVipSectionAccess(req, res, pagePath) {
 
 const protectedPagesPath = path.join(__dirname, 'protected_pages');
 
-app.get('/casino-page.html',
-  (req, res, next) => {
-    console.log(`[${new Date().toISOString()}] REQ para /casino-page.html. SessionID: ${req.sessionID}. User: ${req.session ? req.session.username : 'N/A'} - ANTES de isAuthenticated.`);
-    next();
-  },
-  isAuthenticated,
-  (req, res) => {
-    console.log(`[${new Date().toISOString()}] REQ para /casino-page.html. SessionID: ${req.sessionID}. User: ${req.session ? req.session.username : 'N/A'} - DEPOIS de isAuthenticated, antes de handleVipSectionAccess.`);
-    const pagePath = path.join(protectedPagesPath, 'casino-page.html');
-    handleVipSectionAccess(req, res, pagePath);
-  }
-);
+app.get('/casino-page.html', isAuthenticated, (req, res) => {
+  const pagePath = path.join(protectedPagesPath, 'casino-page.html'); //
+  handleVipSectionAccess(req, res, pagePath);
+});
 
 app.get('/packvip-page.html', isAuthenticated, (req, res) => {
-  console.log(`[${new Date().toISOString()}] REQ para /packvip-page.html (simplificado). User: ${req.session ? req.session.username : 'N/A'}`);
-  const pagePath = path.join(protectedPagesPath, 'packvip-page.html');
+  const pagePath = path.join(protectedPagesPath, 'packvip-page.html'); //
   handleVipSectionAccess(req, res, pagePath);
 });
 
 app.get('/bet-page.html', isAuthenticated, (req, res) => {
-  console.log(`[${new Date().toISOString()}] REQ para /bet-page.html (simplificado). User: ${req.session ? req.session.username : 'N/A'}`);
-  const pagePath = path.join(protectedPagesPath, 'bet-page.html');
+  const pagePath = path.join(protectedPagesPath, 'bet-page.html'); //
   handleVipSectionAccess(req, res, pagePath);
 });
 
 app.get('/generic-dashboard.html', isAuthenticated, (req, res) => {
-  console.log(`[${new Date().toISOString()}] REQ para /generic-dashboard.html. User: ${req.session ? req.session.username : 'N/A'}`);
-  res.sendFile(path.join(protectedPagesPath, 'generic-dashboard.html'));
+  console.log(`[${new Date().toISOString()}] Acessando rota protegida /generic-dashboard.html para usuário ${req.session.username}. Tentando servir de ${protectedPagesPath}`);
+  const pagePath = path.join(protectedPagesPath, 'generic-dashboard.html');
+  // Removido handleVipSectionAccess se esta página não tiver o timer específico de 5 min
+  res.sendFile(pagePath);
 });
 
 app.get('/logout', (req, res) => {
@@ -499,9 +514,7 @@ app.get('/logout', (req, res) => {
   req.session.destroy(err => {
     if (err) {
       console.error(`[${new Date().toISOString()}] Erro ao destruir sessão no logout para ${originalUser}:`, err);
-      if (!res.headersSent) {
-        return res.status(500).send("Erro ao fazer logout.");
-      }
+      if (!res.headersSent) { return res.status(500).send("Erro ao fazer logout."); }
       return;
     }
     res.clearCookie('connect.sid');
@@ -512,19 +525,13 @@ app.get('/logout', (req, res) => {
   });
 });
 
-// Error handling (404 and 500)
-// ... (seu código de error handling existente) ...
 app.use((req, res, next) => {
   const filePath = path.join(__dirname, 'public', '404.html');
   console.log(`[${new Date().toISOString()}] Rota não encontrada: ${req.path}. Tentando servir 404.html.`);
   if (fs.existsSync(filePath)) {
-    if (!res.headersSent) {
-      res.status(404).sendFile(filePath);
-    }
+    if (!res.headersSent) { res.status(404).sendFile(filePath); }
   } else {
-    if (!res.headersSent) {
-      res.status(404).send("Página não encontrada e arquivo 404.html ausente.");
-    }
+    if (!res.headersSent) { res.status(404).send("Página não encontrada e arquivo 404.html ausente."); }
   }
 });
 
@@ -532,13 +539,9 @@ app.use((err, req, res, next) => {
   console.error(`[${new Date().toISOString()}] Erro não tratado: Path: ${req.path}`, err.stack);
   const filePath = path.join(__dirname, 'public', '500.html');
   if (fs.existsSync(filePath)) {
-    if (!res.headersSent) {
-      res.status(500).sendFile(filePath);
-    }
+    if (!res.headersSent) { res.status(500).sendFile(filePath); }
   } else {
-    if (!res.headersSent) {
-      res.status(500).send("Erro interno do servidor e arquivo 500.html ausente.");
-    }
+    if (!res.headersSent) { res.status(500).send("Erro interno do servidor e arquivo 500.html ausente."); }
   }
 });
 
@@ -547,14 +550,10 @@ setInterval(cleanupExpiredCredentials, 60 * 60 * 1000);
 
 app.listen(PORT, () => {
   console.log(`[${new Date().toISOString()}] Servidor rodando na porta ${PORT} - http://localhost:${PORT}`);
-  // This check for redisStore is removed as you are using MemoryStore based on the provided server.js
-  // if (!redisStore) { // This logic might differ if you're using Redis again
-  //   console.warn(`[${new Date().toISOString()}] ATENÇÃO: Usando MemoryStore para sessões. Não recomendado para produção!`);
-  // }
-  if (process.env.NODE_ENV !== 'production') { // General warning for MemoryStore in non-production
-    console.warn(`[${new Date().toISOString()}] ATENÇÃO: Usando MemoryStore para sessões (padrão). Não recomendado para produção! Considere um session store persistente como connect-redis se aplicável.`);
+  if (process.env.NODE_ENV !== 'production') {
+    console.warn(`[${new Date().toISOString()}] ATENÇÃO: Usando MemoryStore para sessões (padrão). Não recomendado para produção!`);
   }
   console.log(`[${new Date().toISOString()}] Credenciais temporárias (12h) expirarão após ${EXPIRATION_TIME_MS / (60 * 60 * 1000)} horas.`);
-  console.log(`[${new Date().toISOString()}] Sessão em páginas VIP específicas expirará após ${VIP_SECTION_TIMEOUT_MS / (60 * 1000)} minutos de entrada na seção.`);
+  console.log(`[${new Date().toISOString()}] Sessão em páginas VIP específicas expirará após ${VIP_SECTION_TIMEOUT_MS / (60 * 1000)} minutos de entrada na seção (se handleVipSectionAccess for usado).`);
   console.log(`[${new Date().toISOString()}] Limpeza periódica de credenciais configurada para rodar a cada hora.`);
 });

@@ -1,438 +1,3 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: Arial, sans-serif;
-  background: linear-gradient(-45deg, #000000, #5a0081, #3a0066, #1a001f);
-  background-size: 400% 400%;
-  animation: gradientFlowDiagonal 15s ease infinite;
-  color: white;
-  overflow-x: hidden;
-}
-
-@keyframes gradientFlowDiagonal {
-  0% {
-    background-position: 0% 0%;
-  }
-
-  50% {
-    background-position: 100% 100%;
-  }
-
-  100% {
-    background-position: 0% 0%;
-  }
-}
-
-header {
-  padding: 20px 40px;
-}
-
-header h1 span {
-  color: #5a0081;
-}
-
-.intro {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 80px 20px;
-  margin-top: 20px;
-  animation: fadeIn 2s ease forwards;
-}
-
-.intro-text {
-  max-width: 700px;
-}
-
-.intro span {
-  color: #5a0081;
-}
-
-.intro h2 {
-  font-size: 36px;
-  margin-bottom: 10px;
-}
-
-.intro p {
-  font-size: 20px;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.intro-video {
-  margin-top: 40px;
-  width: 100%;
-  max-width: 400px;
-  aspect-ratio: 1;
-  position: relative;
-  overflow: hidden;
-  border-radius: 10px;
-}
-
-.intro-video video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.floating-icons {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 40px;
-  /* Reduzido um pouco o gap para acomodar melhor */
-  margin: 60px auto 40px auto;
-  max-width: 1000px;
-  /* Pode ajustar conforme necessário */
-  padding: 0 20px;
-}
-
-.floating-icons p {
-  margin-top: 10px;
-  /* Ajustado */
-  font-size: 16px;
-  font-weight: bold;
-  /* Para dar mais destaque ao texto do ícone */
-}
-
-.carousel {
-  position: relative;
-  max-width: 1200px;
-  margin: 100px auto 60px auto;
-  overflow: hidden;
-  padding-bottom: 60px;
-  opacity: 0;
-  transform: translateY(50px);
-  transition: all 1s ease;
-}
-
-.carousel.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.product {
-  display: none;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  flex-direction: column;
-  padding: 20px;
-}
-
-.product.active {
-  display: flex;
-}
-
-.product img {
-  max-width: 100%;
-  width: 450px;
-  height: auto;
-  margin-bottom: 30px;
-  border-radius: 10px;
-  /* Adicionado para dificultar download */
-  pointer-events: none;
-  -webkit-user-drag: none;
-  -webkit-touch-callout: none;
-  user-select: none;
-  -moz-user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
-}
-
-.product .info {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.product .info span {
-  font-size: 16px;
-  opacity: 0.7;
-  display: block;
-  margin-bottom: 5px;
-}
-
-.product .info h2 {
-  font-size: 40px;
-  margin: 5px 0 15px 0;
-  line-height: 1.2;
-}
-
-.product .info .vip {
-  color: gold;
-  font-size: inherit;
-}
-
-.product .info p {
-  font-size: 18px;
-  margin-bottom: 25px;
-  max-width: 550px;
-  width: 90%;
-  margin-left: auto;
-  margin-right: auto;
-  line-height: 1.6;
-  text-align: center;
-}
-
-.buy-btn {
-  padding: 15px 30px;
-  background-color: #00c67c;
-  color: white;
-  text-decoration: none;
-  border-radius: 8px;
-  font-size: 18px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.buy-btn:hover {
-  background-color: #00a568;
-  transform: translateY(-2px);
-}
-
-
-.nav {
-  position: absolute;
-  top: 50%;
-  font-size: 28px;
-  background: rgba(0, 0, 0, 0.3);
-  border: none;
-  padding: 12px 18px;
-  color: white;
-  cursor: pointer;
-  transform: translateY(-50%);
-  border-radius: 50%;
-  z-index: 10;
-}
-
-.nav:hover {
-  background: rgba(0, 0, 0, 0.5);
-}
-
-.nav.prev {
-  left: 20px;
-}
-
-.nav.next {
-  right: 20px;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes float {
-
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-10px);
-    /* Mantém a animação de flutuação */
-  }
-}
-
-.quality-title {
-  text-align: center;
-  font-size: 32px;
-  margin-top: 60px;
-  margin-bottom: 15px;
-}
-
-.quality-title span {
-  color: #5a0081;
-}
-
-.quality-description {
-  text-align: center;
-  font-size: 18px;
-  margin-bottom: 40px;
-  max-width: 700px;
-  margin-left: auto;
-  margin-right: auto;
-  line-height: 1.6;
-}
-
-.icon-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 200px;
-  /* Largura do container do ícone */
-  text-align: center;
-}
-
-/* REVERTENDO E AJUSTANDO para imagens retangulares */
-.icon-box img {
-  width: 100%;
-  /* Faz a imagem ocupar toda a largura do .icon-box (200px) */
-  height: auto;
-  /* Altura automática para manter a proporção original da imagem */
-  object-fit: contain;
-  /* Garante que toda a imagem seja visível, sem cortes, mantendo a proporção */
-  border-radius: 8px;
-  /* Mantém o arredondamento se desejado */
-  margin-bottom: 10px;
-  /* A animação de float é aplicada à imagem diretamente se desejado, ou ao .icon-box */
-  animation: float 3s ease-in-out infinite;
-  /* Aplicando float diretamente na imagem */
-  /* Adicionado para dificultar download */
-  pointer-events: none;
-  -webkit-user-drag: none;
-  -webkit-touch-callout: none;
-  user-select: none;
-  -moz-user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
-}
-
-
-@media (max-width: 768px) {
-  header {
-    padding: 15px 20px;
-    text-align: center;
-  }
-
-  .intro {
-    padding: 40px 15px;
-  }
-
-  .intro h2 {
-    font-size: 28px;
-  }
-
-  .intro p {
-    font-size: 16px;
-  }
-
-  .intro-video {
-    max-width: 300px;
-  }
-
-  .quality-title {
-    font-size: 26px;
-  }
-
-  .quality-description {
-    font-size: 16px;
-    padding: 0 10px;
-  }
-
-  .floating-icons {
-    gap: 20px;
-    /* Espaço entre os ícones em telas menores */
-    margin: 40px auto;
-    flex-direction: column;
-    /* Ícones empilhados em telas menores */
-  }
-
-  .icon-box {
-    width: 220px;
-    /* Pode aumentar um pouco a largura do container em mobile se os ícones ficarem muito espremidos */
-  }
-
-  /* Imagens dos ícones em telas menores */
-  .icon-box img {
-    width: 100%;
-    /* Ocupa a largura do .icon-box */
-    height: auto;
-    /* Mantém a proporção */
-  }
-
-
-  .floating-icons p {
-    font-size: 15px;
-    /* Aumentado um pouco para melhor leitura */
-  }
-
-  .carousel {
-    margin: 60px auto 40px auto;
-    padding-bottom: 50px;
-  }
-
-  .product img {
-    width: 300px;
-    margin-bottom: 20px;
-  }
-
-  .product .info h2 {
-    font-size: 30px;
-  }
-
-  .product .info p {
-    font-size: 15px;
-    margin-bottom: 20px;
-  }
-
-  .buy-btn {
-    padding: 12px 25px;
-    font-size: 16px;
-  }
-
-  .nav {
-    font-size: 22px;
-    padding: 8px 14px;
-  }
-
-  .nav.prev {
-    left: 10px;
-  }
-
-  .nav.next {
-    right: 10px;
-  }
-}
-
-@media (max-width: 480px) {
-  .intro h2 {
-    font-size: 24px;
-  }
-
-  .intro p {
-    font-size: 15px;
-  }
-
-  .quality-title {
-    font-size: 22px;
-  }
-
-  .quality-description {
-    font-size: 15px;
-  }
-
-  .product .info h2 {
-    font-size: 26px;
-  }
-
-  .product .info p {
-    font-size: 14px;
-  }
-
-  .icon-box {
-    width: 200px;
-    /* Ajuste para telas bem pequenas */
-  }
-}
-
 /* ... (seu CSS existente) ... */
 
 /* ============== ESTILOS PARA SEÇÃO DE GRUPOS FREE ============== */
@@ -440,7 +5,6 @@ header h1 span {
   text-align: center;
   padding: 60px 20px;
   background-color: rgba(26, 0, 31, 0.5);
-  /* Um tom sutil do seu tema */
   border-top: 1px solid #5a0081;
   border-bottom: 1px solid #5a0081;
   margin: 50px 0;
@@ -448,19 +12,16 @@ header h1 span {
 
 .free-groups-section h3 {
   font-size: 30px;
-  /* Ajustado para corresponder a .quality-title */
   margin-bottom: 15px;
   color: #fff;
 }
 
 .free-groups-section h3 span {
   color: #00c67c;
-  /* Cor de destaque verde */
 }
 
 .free-groups-section p {
   font-size: 18px;
-  /* Ajustado para corresponder a .quality-description */
   margin-bottom: 30px;
   max-width: 700px;
   margin-left: auto;
@@ -470,16 +31,15 @@ header h1 span {
 }
 
 .free-groups-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  flex-wrap: wrap;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
 }
 
 .free-group-btn {
   padding: 15px 30px;
   background-color: #5a0081;
-  /* Roxo MGL */
   color: white;
   text-decoration: none;
   border-radius: 8px;
@@ -493,224 +53,86 @@ header h1 span {
 
 .free-group-btn:hover {
   background-color: #3a0066;
-  /* Roxo MGL mais escuro */
   transform: translateY(-3px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
 /* ============== ESTILOS PARA O MODAL DE REGISTRO ============== */
 .modal {
-  display: none;
-  position: fixed;
+  display: none; 
+  position: fixed; 
   z-index: 1001;
-  /* Acima de outros elementos */
   left: 0;
   top: 0;
   width: 100%;
   height: 100%;
-  overflow: auto;
-  background-color: rgba(0, 0, 0, 0.7);
+  overflow: auto; 
+  background-color: rgba(0,0,0,0.7); 
   backdrop-filter: blur(5px);
-  /* Efeito de desfoque no fundo */
 }
 
 .modal-content {
   background-color: #1a001f;
-  /* Roxo bem escuro do seu tema */
   color: white;
   margin: 10% auto;
-  /* Centralizado e com espaço do topo */
   padding: 35px;
   border: 1px solid #5a0081;
-  /* Borda roxa MGL */
   border-radius: 12px;
   width: 90%;
   max-width: 550px;
   text-align: center;
-  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 5px 25px rgba(0,0,0,0.5);
   animation: slideInModal 0.5s ease-out;
 }
 
 @keyframes slideInModal {
-  from {
-    transform: translateY(-50px);
-    opacity: 0;
-  }
-
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+  from { transform: translateY(-50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
-.modal-content h3 {
-  margin-bottom: 20px;
-  color: #00c67c;
-  /* Verde para o título do modal */
-  font-size: 24px;
-}
-
-.modal-content p {
-  font-size: 16px;
-  margin-bottom: 20px;
-  line-height: 1.5;
-}
-
-.modal-content strong {
-  color: #00c67c;
-}
+.modal-content h3 { margin-bottom: 20px; color: #00c67c; font-size: 24px; }
+.modal-content p { font-size: 16px; margin-bottom: 20px; line-height: 1.5; }
+.modal-content strong { color: #00c67c; }
 
 .modal-content input[type="text"],
 .modal-content input[type="email"] {
-  width: calc(100% - 24px);
-  padding: 12px;
-  margin-bottom: 18px;
-  border-radius: 6px;
-  border: 1px solid #5a0081;
-  background-color: #2c003e;
-  /* Roxo um pouco mais claro para campos */
-  color: white;
-  font-size: 16px;
+  width: calc(100% - 24px); padding: 12px; margin-bottom: 18px;
+  border-radius: 6px; border: 1px solid #5a0081;
+  background-color: #2c003e; color: white; font-size: 16px;
 }
-
 .modal-content input[type="text"]::placeholder,
-.modal-content input[type="email"]::placeholder {
-  color: #b0a0b0;
-  /* Cor de placeholder suave */
-}
+.modal-content input[type="email"]::placeholder { color: #b0a0b0; }
 
 .modal-content button[type="submit"] {
-  padding: 14px 28px;
-  background-color: #00c67c;
-  /* Botão verde como .buy-btn */
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 17px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  width: auto;
-  min-width: 200px;
+  padding: 14px 28px; background-color: #00c67c; color: white;
+  border: none; border-radius: 8px; font-size: 17px; font-weight: bold;
+  cursor: pointer; transition: background-color 0.3s ease, transform 0.2s ease;
+  width: auto; min-width: 200px;
 }
-
-.modal-content button[type="submit"]:hover {
-  background-color: #00a568;
-  transform: translateY(-2px);
-}
-
-.modal-content button[type="submit"]:disabled {
-  background-color: #555;
-  cursor: not-allowed;
-  transform: translateY(0);
-}
+.modal-content button[type="submit"]:hover { background-color: #00a568; transform: translateY(-2px); }
+.modal-content button[type="submit"]:disabled { background-color: #555; cursor: not-allowed; transform: translateY(0); }
 
 .close-btn {
-  color: #aaa;
-  float: right;
-  font-size: 32px;
-  font-weight: bold;
-  line-height: 0.5;
-  /* Ajustar posicionamento vertical */
-  cursor: pointer;
-  transition: color 0.3s ease;
+  color: #aaa; float: right; font-size: 32px; font-weight: bold;
+  line-height: 0.5; cursor: pointer; transition: color 0.3s ease;
 }
+.close-btn:hover, .close-btn:focus { color: #fff; text-decoration: none; }
 
-.close-btn:hover,
-.close-btn:focus {
-  color: #fff;
-  text-decoration: none;
-}
+#modalMessage, .modal-message-placeholder { margin-top: 15px; font-size: 0.95em; min-height: 1.2em; }
+.modal-message-success { color: #00c67c; }
+.modal-message-error { color: #ff4d4d; }
 
-#modalMessage,
-.modal-message-placeholder {
-  /* Classe genérica e ID */
-  margin-top: 15px;
-  font-size: 0.95em;
-  min-height: 1.2em;
-  /* Para evitar que o layout salte */
-}
-
-.modal-message-success {
-  color: #00c67c;
-  /* Verde */
-}
-
-.modal-message-error {
-  color: #ff4d4d;
-  /* Vermelho */
-}
-
-
-/* Ajustes responsivos para a nova seção e modal */
 @media (max-width: 768px) {
-  .free-groups-section h3 {
-    font-size: 26px;
-  }
-
-  .free-groups-section p {
-    font-size: 16px;
-  }
-
-  .free-group-btn {
-    font-size: 16px;
-    padding: 12px 25px;
-  }
-
-  .modal-content {
-    margin: 15% auto;
-    padding: 25px;
-    max-width: 90%;
-  }
-
-  .modal-content h3 {
-    font-size: 22px;
-  }
+  .free-groups-section h3 { font-size: 26px; }
+  .free-groups-section p { font-size: 16px; }
+  .free-group-btn { font-size: 16px; padding: 12px 25px; }
+  .modal-content { margin: 15% auto; padding: 25px; max-width: 90%; }
+  .modal-content h3 { font-size: 22px; }
 }
 
 @media (max-width: 480px) {
-  .free-groups-buttons {
-    flex-direction: column;
-    /* Botões empilhados em telas muito pequenas */
-  }
-
-  .free-group-btn {
-    width: 100%;
-    /* Ocupa largura total */
-    margin-bottom: 10px;
-  }
-
-  .free-group-btn:last-child {
-    margin-bottom: 0;
-  }
-
-  .modal-content {
-    margin-top: 20%;
-  }
-}
-
-/* Retirando a proteção de imagem que estava nas imagens do carrossel,
-   se você quiser manter, copie as regras de .product img do seu CSS original:
-   pointer-events: none; -webkit-user-drag: none; ... etc.
-   e aplique às .icon-box img e .product img se desejar.
-*/
-.icon-box img {
-  /* Apenas a animação mantida, remover outras proteções se não desejado */
-  width: 100%;
-  height: auto;
-  object-fit: contain;
-  border-radius: 8px;
-  margin-bottom: 10px;
-  animation: float 3s ease-in-out infinite;
-  /* Removido: pointer-events, user-drag, user-select etc. Adicione se necessário. */
-}
-
-.product img {
-  /* Apenas o básico, remover outras proteções se não desejado */
-  max-width: 100%;
-  width: 450px;
-  height: auto;
-  margin-bottom: 30px;
-  border-radius: 10px;
-  /* Removido: pointer-events, user-drag, user-select etc. Adicione se necessário. */
+    .free-groups-buttons { flex-direction: column; }
+    .free-group-btn { width: 100%; margin-bottom: 10px; }
+    .free-group-btn:last-child { margin-bottom: 0; }
+    .modal-content { margin-top: 20%; }
 }
